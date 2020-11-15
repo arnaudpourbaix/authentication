@@ -1,4 +1,4 @@
-import { JwtAuthGuard } from '@authentification/nest-auth';
+import { JwtAuthGuard } from '@authentication/nest-auth';
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 
 @Controller()

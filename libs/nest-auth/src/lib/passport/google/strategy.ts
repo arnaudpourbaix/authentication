@@ -7,7 +7,7 @@ import {
   GoogleConfig,
   JwtData,
   User,
-} from '@authentification/common-auth';
+} from '@authentication/common-auth';
 import { AuthService } from '../../services/auth.service';
 
 @Injectable()

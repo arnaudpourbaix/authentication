@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { User } from '@authentification/common-auth';
+import { User } from '@authentication/common-auth';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';

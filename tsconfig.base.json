@@ -21,13 +21,13 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "@authentification/nest-auth": [
+            "@authentication/nest-auth": [
                 "libs/nest-auth/src/index.ts"
             ],
-            "@authentification/common-auth": [
+            "@authentication/common-auth": [
                 "libs/common-auth/src/index.ts"
             ],
-            "@authentification/ng-auth": [
+            "@authentication/ng-auth": [
                 "libs/ng-auth/src/index.ts"
             ]
         },

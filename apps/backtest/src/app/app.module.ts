@@ -1,4 +1,4 @@
-import { NestAuthModule } from '@authentification/nest-auth';
+import { NestAuthModule } from '@authentication/nest-auth';
 import { HttpModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';

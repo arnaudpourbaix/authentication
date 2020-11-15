@@ -3,7 +3,7 @@ import {
   JwtConfig,
   JwtPayload,
   User,
-} from '@authentification/common-auth';
+} from '@authentication/common-auth';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';

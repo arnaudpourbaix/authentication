@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { User } from '@authentification/common-auth';
+import { User } from '@authentication/common-auth';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { AuthActions } from '../../state/auth.action';

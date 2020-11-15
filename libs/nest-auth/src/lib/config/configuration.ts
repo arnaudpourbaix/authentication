@@ -1,4 +1,4 @@
-import { AuthConfig } from '@authentification/common-auth';
+import { AuthConfig } from '@authentication/common-auth';
 
 export default (): AuthConfig => ({
   jwt: {

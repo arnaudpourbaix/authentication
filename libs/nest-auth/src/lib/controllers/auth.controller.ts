@@ -1,4 +1,4 @@
-import { AuthConfig, LoginConfig, User } from '@authentification/common-auth';
+import { AuthConfig, LoginConfig, User } from '@authentication/common-auth';
 import {
   Controller,
   Get,

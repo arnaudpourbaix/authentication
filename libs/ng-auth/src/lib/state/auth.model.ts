@@ -1,4 +1,4 @@
-import { User } from '@authentification/common-auth';
+import { User } from '@authentication/common-auth';
 
 export const AUTH_STATE_NAME = 'auth';
 

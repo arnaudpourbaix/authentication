@@ -1,4 +1,4 @@
-import { authDatabaseMigrations } from '@authentification/nest-auth';
+import { authDatabaseMigrations } from '@authentication/nest-auth';
 import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions';
 import { UserRecord1604585956439 } from './migrations/1604585956439-UserRecord';
 

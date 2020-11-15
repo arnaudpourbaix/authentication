@@ -4,7 +4,7 @@ import {
   JwtData,
   JwtPayload,
   User,
-} from '@authentification/common-auth';
+} from '@authentication/common-auth';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';

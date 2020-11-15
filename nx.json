@@ -1,5 +1,5 @@
 {
-  "npmScope": "authentification",
+  "npmScope": "authentication",
   "affected": {
     "defaultBase": "master"
   },

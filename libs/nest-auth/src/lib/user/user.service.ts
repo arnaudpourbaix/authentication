@@ -1,4 +1,4 @@
-import { User } from '@authentification/common-auth';
+import { User } from '@authentication/common-auth';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';

@@ -1,4 +1,4 @@
-import { AuthConfig, JwtConfig } from '@authentification/common-auth';
+import { AuthConfig, JwtConfig } from '@authentication/common-auth';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
