@@ -1,0 +1,45 @@
+<form
+  [formGroup]="loginForm"
+  (ngSubmit)="onSubmit()"
+  *ngIf="{ loading: loading$ | async, status: responseStatus$ | async } as data"
+>
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>Se connecter</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-spinner
+        [style.display]="data.loading ? 'block' : 'none'"
+        class="loading-spinner"
+        diameter="50"
+      >
+      </mat-spinner>
+      <mat-form-field appearance="fill">
+        <mat-label>Utilisateur ou adresse e-mail</mat-label>
+        <input matInput #username formControlName="username" />
+        <mat-error *ngIf="loginForm.controls.username.errors?.required">
+          Saisissez un utilisateur</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Saisissez votre mot de passe</mat-label>
+        <input matInput formControlName="password" type="password" />
+        <mat-error *ngIf="loginForm.controls.password.errors?.required">
+          Entrez un mot de passe</mat-error
+        >
+      </mat-form-field>
+      <mat-error *ngIf="data.status" class="error">
+        <mat-icon>error</mat-icon>
+        Utilisateur ou mot de passe incorrect
+      </mat-error>
+    </mat-card-content>
+    <mat-card-actions>
+      <a href="v1/auth/google">
+        <button mat-raised-button type="button">
+          Créer un compte
+        </button>
+      </a>
+      <button mat-raised-button type="submit" color="primary">Connexion</button>
+    </mat-card-actions>
+  </mat-card>
+</form>

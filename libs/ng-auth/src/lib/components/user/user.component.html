@@ -1,0 +1,19 @@
+<div *ngIf="{ user: user$ | async } as data">
+    <button class="login" *ngIf="!data.user" mat-raised-button (click)="login()">
+        <mat-icon>account_circle</mat-icon>
+        Se connecter
+    </button>
+    <div *ngIf="data.user" class="profile">
+        <button mat-button [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+            <span *ngIf="data.user.displayName">{{data.user.displayName}}</span>
+            <img *ngIf="data.user.photoUrl" [src]="data.user.photoUrl" [title]="data.user.displayName" />
+        </button>
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="logout()">
+                <mat-icon>exit_to_app</mat-icon>
+                <span>Se déconnecter</span>
+            </button>
+        </mat-menu>
+    </div>
+</div>

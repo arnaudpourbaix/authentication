@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "wmaurer.change-case",
+    "yzhang.markdown-all-in-one",
+    "esbenp.prettier-vscode",
+    "wayou.vscode-todo-highlight",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "eamodio.gitlens",
+    "nrwl.angular-console",
+    "angular.ng-template",
+    "firsttris.vscode-jest-runner"
+  ]
+}

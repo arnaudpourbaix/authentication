@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Debug Nest Framework",
+            "port": 7777,
+            "timeout": 5000
+        },
+        {
+            "type": "node",
+            "name": "Unit Tests",
+            "request": "launch",
+            "runtimeArgs": [
+                "--inspect-brk",
+                "${workspaceRoot}/node_modules/@angular/cli/bin/ng",
+                "test",
+                "socfon-lib-manager",
+                "--runInBand",
+                "--watch"
+            ],
+            "port": 9229,
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        }
+    ]
+}

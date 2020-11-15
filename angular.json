@@ -1,0 +1,270 @@
+{
+  "version": 1,
+  "projects": {
+    "common-auth": {
+      "root": "libs/common-auth",
+      "sourceRoot": "libs/common-auth/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/common-auth/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/common-auth/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "nest-auth": {
+      "root": "libs/nest-auth",
+      "sourceRoot": "libs/nest-auth/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/nest-auth/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/nest-auth/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "ng-auth": {
+      "projectType": "library",
+      "root": "libs/ng-auth",
+      "sourceRoot": "libs/ng-auth/src",
+      "prefix": "apx-auth",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/ng-auth/tsconfig.lib.json",
+              "libs/ng-auth/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/ng-auth/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/ng-auth/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "backtest": {
+      "root": "apps/backtest",
+      "sourceRoot": "apps/backtest/src",
+      "projectType": "application",
+      "prefix": "backtest",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/backtest",
+            "main": "apps/backtest/src/main.ts",
+            "tsConfig": "apps/backtest/tsconfig.app.json",
+            "assets": ["apps/backtest/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/backtest/src/environments/environment.ts",
+                  "with": "apps/backtest/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "backtest:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/backtest/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/backtest/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "fronttest": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "apps/fronttest",
+      "sourceRoot": "apps/fronttest/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/fronttest",
+            "index": "apps/fronttest/src/index.html",
+            "main": "apps/fronttest/src/main.ts",
+            "polyfills": "apps/fronttest/src/polyfills.ts",
+            "tsConfig": "apps/fronttest/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "apps/fronttest/src/favicon.ico",
+              "apps/fronttest/src/assets"
+            ],
+            "styles": ["apps/fronttest/src/styles.scss"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/fronttest/src/environments/environment.ts",
+                  "with": "apps/fronttest/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "fronttest:build",
+            "proxyConfig": "apps/fronttest/proxy.conf.json"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "fronttest:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "fronttest:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/fronttest/tsconfig.app.json",
+              "apps/fronttest/tsconfig.spec.json",
+              "apps/fronttest/tsconfig.editor.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/fronttest/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/fronttest/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/angular"
+  },
+  "schematics": {
+    "@nrwl/workspace": {
+      "library": {
+        "linter": "tslint"
+      }
+    },
+    "@nrwl/cypress": {
+      "cypress-project": {
+        "linter": "tslint"
+      }
+    },
+    "@nrwl/node": {
+      "application": {
+        "linter": "tslint"
+      },
+      "library": {
+        "linter": "tslint"
+      }
+    },
+    "@nrwl/nest": {
+      "application": {
+        "linter": "tslint"
+      },
+      "library": {
+        "linter": "tslint"
+      }
+    },
+    "@nrwl/express": {
+      "application": {
+        "linter": "tslint"
+      },
+      "library": {
+        "linter": "tslint"
+      }
+    },
+    "@nrwl/angular:application": {
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "unitTestRunner": "jest"
+    }
+  },
+  "defaultProject": "fronttest"
+}
