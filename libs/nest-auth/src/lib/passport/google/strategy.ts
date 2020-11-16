@@ -49,8 +49,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         displayName: profile.displayName,
         photoUrl: profile.photos?.[0]?.value,
       };
-      const jwt = await this.authService.validateOAuthLogin(jwtData, user);
-      done(null, { jwt });
+      console.log('GoogleStrategy', 'validate');
+      //   const jwt = await this.authService.validateOAuthLogin(jwtData, user);
+      done(null, { user });
     } catch (err) {
       done(err, false);
     }

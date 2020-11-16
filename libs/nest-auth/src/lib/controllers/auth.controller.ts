@@ -48,7 +48,6 @@ export class AuthController {
         ?.loginSuccessUrl;
       res.redirect(`${loginSuccessUrl}/#/?jwt=${req.user.jwt}`);
     } else {
-      // console.log('googleLoginCallback', req.user);
       // res.redirect(`${loginSuccessUrl}/#/?jwt=${req.user.jwt}`);
     }
   }
