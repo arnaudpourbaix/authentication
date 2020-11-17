@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('username')
   usernameInput: ElementRef | undefined;
 
-  loginForm = this.formBuilder.group(
+  form = this.formBuilder.group(
     {
       username: ['', Validators.required],
       password: ['', Validators.required],
@@ -57,6 +57,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {}
 
   ngOnInit() {
+    this.store.dispatch(new AuthActions.ResetStatus());
     this.loading$ = merge(
       this.actions$.pipe(
         ofActionDispatched(AuthActions.Login),
@@ -82,19 +83,15 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroy$.complete();
   }
 
-  create() {
-    this.store.dispatch(new AuthActions.Create());
-  }
-
   onSubmit() {
-    if (this.loginForm.invalid) {
+    if (this.form.invalid) {
       return;
     }
     this.store
       .dispatch(
         new AuthActions.Login(
-          this.loginForm.controls.username.value,
-          this.loginForm.controls.password.value
+          this.form.controls.username.value,
+          this.form.controls.password.value
         )
       )
       .subscribe(() => {

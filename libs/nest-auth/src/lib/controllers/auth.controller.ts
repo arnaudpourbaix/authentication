@@ -1,5 +1,6 @@
 import { AuthConfig, LoginConfig, User } from '@authentication/common-auth';
 import {
+  Body,
   Controller,
   Get,
   Post,
@@ -26,6 +27,11 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   async login(@Req() req: any) {
     return this.authService.login(req.user);
+  }
+
+  @Post('register')
+  async register(@Body() data: any) {
+    console.log(data);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -1,6 +1,12 @@
 export namespace AuthActions {
-  export class Create {
-    static readonly type = '[Auth] Create';
+  export class ResetStatus {
+    static readonly type = '[Auth] ResetStatus';
+  }
+
+  export class Register {
+    static readonly type = '[Auth] Register';
+
+    constructor(public username: string, public password: string) {}
   }
 
   export class Login {

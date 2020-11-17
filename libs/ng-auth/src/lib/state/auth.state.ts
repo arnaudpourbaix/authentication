@@ -39,19 +39,29 @@ export class AuthState {
     return state.user;
   }
 
-  @Action(AuthActions.Create)
-  create(ctx: StateContext<AuthStateModel>, action: AuthActions.Create) {
-    return this.http.get<any>('v1/auth/google').pipe(
-      map((profile) => {
-        console.log(profile);
-      }),
-      catchError((error: HttpErrorResponse) => {
-        ctx.patchState({
-          responseStatus: error.status,
-        });
-        return throwError(error);
+  @Action(AuthActions.ResetStatus)
+  resetStatus(ctx: StateContext<AuthStateModel>, action: AuthActions.Logout) {
+    ctx.patchState({ responseStatus: undefined });
+  }
+
+  @Action(AuthActions.Register)
+  register(ctx: StateContext<AuthStateModel>, action: AuthActions.Register) {
+    return this.http
+      .post<any>('v1/auth/register', {
+        username: action.username,
+        password: action.password,
       })
-    );
+      .pipe(
+        map((result) => {
+          console.log(result);
+        }),
+        catchError((error: HttpErrorResponse) => {
+          ctx.patchState({
+            responseStatus: error.status,
+          });
+          return throwError(error);
+        })
+      );
   }
 
   @Action(AuthActions.Login)

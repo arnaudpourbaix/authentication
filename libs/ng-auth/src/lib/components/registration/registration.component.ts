@@ -20,6 +20,8 @@ import { map, startWith, takeUntil } from 'rxjs/operators';
 import { AuthActions } from '../../state/auth.action';
 import { AuthState } from '../../state/auth.state';
 import { FormGroupTyped } from '../../utils/typed-form';
+import { MustMatchValidator } from '../../validators/must-match.validator';
+import * as bcrypt from 'bcryptjs';
 
 @Component({
   selector: 'apx-auth-registration',
@@ -35,15 +37,20 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('username')
   usernameInput: ElementRef | undefined;
 
-  loginForm = this.formBuilder.group(
+  form = this.formBuilder.group(
     {
       username: ['', Validators.required],
-      password: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required],
     },
-    { updateOn: 'submit' }
+    {
+      updateOn: 'submit',
+      validators: MustMatchValidator('password', 'confirmPassword'),
+    }
   ) as FormGroupTyped<{
     username: string;
     password: string;
+    confirmPassword: string;
   }>;
 
   loading$: Observable<boolean> | undefined;
@@ -57,13 +64,14 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {}
 
   ngOnInit() {
+    this.store.dispatch(new AuthActions.ResetStatus());
     this.loading$ = merge(
       this.actions$.pipe(
-        ofActionDispatched(AuthActions.Login),
+        ofActionDispatched(AuthActions.Register),
         map(() => true)
       ),
       this.actions$.pipe(
-        ofActionCompleted(AuthActions.Login),
+        ofActionCompleted(AuthActions.Register),
         map(() => false)
       )
     ).pipe(takeUntil(this.destroy$), startWith(false));
@@ -82,24 +90,13 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroy$.complete();
   }
 
-  create() {
-    this.store.dispatch(new AuthActions.Create());
-  }
-
   onSubmit() {
-    if (this.loginForm.invalid) {
+    if (this.form.invalid) {
       return;
     }
-    this.store
-      .dispatch(
-        new AuthActions.Login(
-          this.loginForm.controls.username.value,
-          this.loginForm.controls.password.value
-        )
-      )
-      .subscribe(() => {
-        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-        this.router.navigate([returnUrl]);
-      });
+    const password = bcrypt.hashSync(this.form.controls.password.value, 10);
+    this.store.dispatch(
+      new AuthActions.Register(this.form.controls.username.value, password)
+    );
   }
 }

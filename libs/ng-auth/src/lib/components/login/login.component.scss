@@ -11,6 +11,7 @@
 
 mat-form-field {
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 mat-card-actions {
@@ -32,5 +33,9 @@ mat-card-actions {
   font-family: roboto, 'Noto Sans Myanmar UI', arial, sans-serif;
   mat-icon {
     font-size: 1rem;
+    margin-right: 0.5rem;
+  }
+  span {
+    margin-top: 0.1rem;
   }
 }

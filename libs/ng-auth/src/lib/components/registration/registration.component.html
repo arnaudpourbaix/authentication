@@ -1,9 +1,9 @@
 <form
-  [formGroup]="loginForm"
+  [formGroup]="form"
   (ngSubmit)="onSubmit()"
   *ngIf="{ loading: loading$ | async, status: responseStatus$ | async } as data"
 >
-  <mat-card class="login-card">
+  <mat-card class="registration-card">
     <mat-card-header>
       <mat-card-title>Créer un compte</mat-card-title>
     </mat-card-header>
@@ -15,22 +15,61 @@
       >
       </mat-spinner>
       <mat-form-field appearance="fill">
-        <mat-label>Utilisateur ou adresse e-mail</mat-label>
+        <mat-label>Nom d'utilisateur</mat-label>
         <input matInput #username formControlName="username" />
-        <mat-error *ngIf="loginForm.controls.username.errors?.required">
-          Saisissez un utilisateur</mat-error
+        <mat-error
+          *ngIf="form.controls.username.errors?.required"
+          class="error"
+        >
+          <mat-icon>error</mat-icon>
+          <span>Saisissez un utilisateur</span></mat-error
         >
       </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Saisissez votre mot de passe</mat-label>
-        <input matInput formControlName="password" type="password" />
-        <mat-error *ngIf="loginForm.controls.password.errors?.required">
-          Entrez un mot de passe</mat-error
-        >
-      </mat-form-field>
+      <div class="passwords">
+        <mat-form-field appearance="fill">
+          <mat-label>Mot de passe</mat-label>
+          <input matInput formControlName="password" type="password" />
+          <mat-error
+            *ngIf="form.controls.password.errors?.required"
+            class="error"
+          >
+            <mat-icon>error</mat-icon>
+            <span>Entrez un mot de passe</span></mat-error
+          >
+          <mat-error
+            *ngIf="form.controls.password.errors?.minlength"
+            class="error"
+          >
+            <mat-icon>error</mat-icon>
+            <span
+              >Utilisez
+              {{ form.controls.password.errors?.minlength.requiredLength }}
+              caractères ou plus pour votre mot de passe.</span
+            ></mat-error
+          >
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Confirmer</mat-label>
+          <input matInput formControlName="confirmPassword" type="password" />
+          <mat-error
+            *ngIf="form.controls.password.errors?.required"
+            class="error"
+          >
+            <mat-icon>error</mat-icon>
+            <span>Confirmez votre mot de passe</span></mat-error
+          >
+          <mat-error
+            *ngIf="form.controls.confirmPassword.errors?.mustMatch"
+            class="error"
+          >
+            <mat-icon>error</mat-icon>
+            <span>Les mots de passe ne correspondent pas</span></mat-error
+          >
+        </mat-form-field>
+      </div>
       <mat-error *ngIf="data.status" class="error">
         <mat-icon>error</mat-icon>
-        Utilisateur ou mot de passe incorrect
+        <span>Utilisateur ou mot de passe incorrect</span>
       </mat-error>
     </mat-card-content>
     <mat-card-actions>

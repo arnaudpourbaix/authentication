@@ -1,5 +1,5 @@
 <form
-  [formGroup]="loginForm"
+  [formGroup]="form"
   (ngSubmit)="onSubmit()"
   *ngIf="{ loading: loading$ | async, status: responseStatus$ | async } as data"
 >
@@ -17,28 +17,34 @@
       <mat-form-field appearance="fill">
         <mat-label>Utilisateur ou adresse e-mail</mat-label>
         <input matInput #username formControlName="username" />
-        <mat-error *ngIf="loginForm.controls.username.errors?.required">
-          Saisissez un utilisateur</mat-error
+        <mat-error
+          *ngIf="form.controls.username.errors?.required"
+          class="error"
         >
+          <mat-icon>error</mat-icon>
+          <span>Saisissez un utilisateur</span>
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Saisissez votre mot de passe</mat-label>
         <input matInput formControlName="password" type="password" />
-        <mat-error *ngIf="loginForm.controls.password.errors?.required">
-          Entrez un mot de passe</mat-error
+        <mat-error
+          *ngIf="form.controls.password.errors?.required"
+          class="error"
+        >
+          <mat-icon>error</mat-icon>
+          <span>Entrez un mot de passe</span></mat-error
         >
       </mat-form-field>
       <mat-error *ngIf="data.status" class="error">
         <mat-icon>error</mat-icon>
-        Utilisateur ou mot de passe incorrect
+        <span>Utilisateur ou mot de passe incorrect</span>
       </mat-error>
     </mat-card-content>
     <mat-card-actions>
-      <a href="v1/auth/google">
-        <button mat-raised-button type="button">
-          Créer un compte
-        </button>
-      </a>
+      <button [routerLink]="['/register']" mat-raised-button type="button">
+        Créer un compte
+      </button>
       <button mat-raised-button type="submit" color="primary">Connexion</button>
     </mat-card-actions>
   </mat-card>
