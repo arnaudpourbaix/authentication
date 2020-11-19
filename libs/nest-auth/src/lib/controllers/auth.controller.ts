@@ -1,4 +1,9 @@
-import { AuthConfig, LoginConfig, User } from '@authentication/common-auth';
+import {
+  AuthConfig,
+  LoginConfig,
+  RegisterData,
+  User,
+} from '@authentication/common-auth';
 import {
   Body,
   Controller,
@@ -15,12 +20,14 @@ import { GoogleAuthGuard } from '../passport/google/guard';
 import { JwtAuthGuard } from '../passport/jwt/guard';
 import { LocalAuthGuard } from '../passport/local/guard';
 import { AuthService } from '../services/auth.service';
+import { UserService } from '../user/user.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly configService: ConfigService<AuthConfig>,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly userService: UserService
   ) {}
 
   @Post('login')
@@ -30,8 +37,8 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Body() data: any) {
-    console.log(data);
+  async register(@Body() data: RegisterData) {
+    return this.userService.create(data as any);
   }
 
   @UseGuards(JwtAuthGuard)

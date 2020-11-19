@@ -6,4 +6,5 @@ export * from './lib/config/login.model';
 export * from './lib/jwt/jwt-data';
 export * from './lib/jwt/payload';
 
-export * from './lib/user/user';
+export * from './lib/user/register-data.model';
+export * from './lib/user/user.model';

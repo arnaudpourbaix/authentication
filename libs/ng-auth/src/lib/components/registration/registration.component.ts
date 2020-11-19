@@ -7,7 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import {
   Actions,
   ofActionCompleted,
@@ -21,7 +21,6 @@ import { AuthActions } from '../../state/auth.action';
 import { AuthState } from '../../state/auth.state';
 import { FormGroupTyped } from '../../utils/typed-form';
 import { MustMatchValidator } from '../../validators/must-match.validator';
-import * as bcrypt from 'bcryptjs';
 
 @Component({
   selector: 'apx-auth-registration',
@@ -30,6 +29,8 @@ import * as bcrypt from 'bcryptjs';
 })
 export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
+
+  passwordMinlength = 3;
 
   @Select(AuthState.responseStatus)
   responseStatus$: Observable<number | undefined> | undefined;
@@ -40,7 +41,10 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
   form = this.formBuilder.group(
     {
       username: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: [
+        '',
+        [Validators.required, Validators.minLength(this.passwordMinlength)],
+      ],
       confirmPassword: ['', Validators.required],
     },
     {
@@ -57,7 +61,6 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private readonly formBuilder: FormBuilder,
-    private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly store: Store,
     private readonly actions$: Actions
@@ -94,9 +97,11 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.form.invalid) {
       return;
     }
-    const password = bcrypt.hashSync(this.form.controls.password.value, 10);
     this.store.dispatch(
-      new AuthActions.Register(this.form.controls.username.value, password)
+      new AuthActions.Register(
+        this.form.controls.username.value,
+        this.form.controls.password.value
+      )
     );
   }
 }
