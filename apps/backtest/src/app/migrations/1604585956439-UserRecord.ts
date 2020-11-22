@@ -1,8 +1,8 @@
-import { UserEntity } from 'libs/nest-auth/src/lib/user/entities/user.entity';
-import { getRepository, MigrationInterface, QueryRunner } from 'typeorm';
+import { UserEntity } from '@authentication/nest-auth';
+import { getRepository, MigrationInterface } from 'typeorm';
 
 export class UserRecord1604585956439 implements MigrationInterface {
-  public async up(queryRunner: QueryRunner): Promise<void> {
+  public async up(): Promise<void> {
     const repository = getRepository(UserEntity);
     const user = repository.create({
       username: 'a',
@@ -12,5 +12,11 @@ export class UserRecord1604585956439 implements MigrationInterface {
     await repository.save(user);
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(): Promise<void> {
+    const repository = getRepository(UserEntity);
+    const user = await repository.findOne('a');
+    if (user) {
+      await repository.remove(user);
+    }
+  }
 }

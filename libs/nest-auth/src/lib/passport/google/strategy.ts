@@ -1,13 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { AuthConfig, GoogleConfig, User } from '@authentication/common-auth';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
-import {
-  AuthConfig,
-  GoogleConfig,
-  JwtData,
-  User,
-} from '@authentication/common-auth';
 import { AuthService } from '../../services/auth.service';
 
 @Injectable()
@@ -31,29 +26,34 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: {
       id: string;
       displayName: string;
+      emails?: { value: string; verified: boolean }[];
       name?: { familyName: string; givenName: string };
       photos?: { value: string }[];
-    },
-    done: Function
+    }
+    // done: Function
   ) {
     try {
-      const jwtData: JwtData = {
-        thirdPartyId: profile.id,
-        accessToken,
-        refreshToken,
-      };
+      //   const jwtData: JwtData = {
+      //     thirdPartyId: profile.id,
+      //     accessToken,
+      //     refreshToken,
+      //   };
       const user: User = {
         id: profile.id,
         // googleId: profile.id,
         username: '',
+        email: profile.emails?.[0].value as string,
         displayName: profile.displayName,
         photoUrl: profile.photos?.[0]?.value,
       };
       console.log('GoogleStrategy', 'validate');
       //   const jwt = await this.authService.validateOAuthLogin(jwtData, user);
-      done(null, { user });
+      //   done(null, { user });
+      return { user };
     } catch (err) {
-      done(err, false);
+      //   done(err, false);
+      console.log('validate error', err);
+      throw new UnauthorizedException(err);
     }
   }
 }

@@ -9,9 +9,9 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { classToPlain } from 'class-transformer';
 import { sign } from 'jsonwebtoken';
 import { UserService } from '../user/user.service';
-import { classToPlain } from 'class-transformer';
 
 @Injectable()
 export class AuthService {
@@ -21,9 +21,9 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<User | null> {
+  async validateLogin(username: string, pass: string): Promise<User | null> {
     const user = await this.userService.findOne(username);
-    if (user && (await this.passwordsAreEqual(user.password, pass))) {
+    if (user && (await bcrypt.compare(pass, user.password))) {
       return classToPlain(user) as User;
     }
     return null;
@@ -35,9 +35,9 @@ export class AuthService {
     return user;
   }
 
-  async validateOAuthLogin(jwtData: JwtData, user: User): Promise<string> {
+  async validateOAuthLogin(jwtData: JwtData): Promise<string> {
     try {
-      await this.userService.create(user);
+      //   await this.userService.create(user);
       const jwt: string = sign(
         jwtData,
         this.configService.get<JwtConfig>('jwt')?.secretKey as string,
@@ -47,12 +47,5 @@ export class AuthService {
     } catch (err) {
       throw new InternalServerErrorException('validateOAuthLogin', err.message);
     }
-  }
-
-  private async passwordsAreEqual(
-    hashedPassword: string,
-    plainPassword: string
-  ): Promise<boolean> {
-    return await bcrypt.compare(plainPassword, hashedPassword);
   }
 }

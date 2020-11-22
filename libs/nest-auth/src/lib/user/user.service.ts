@@ -1,5 +1,5 @@
-import { RegisterData, User } from '@authentication/common-auth';
-import { Injectable } from '@nestjs/common';
+import { CreateUserDto } from '@authentication/common-auth';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { UserRepository } from './user.repository';
@@ -16,11 +16,13 @@ export class UserService {
   }
 
   //async create(user: User) {
-  async create(user: RegisterData) {
-    const existingUser = this.findOne(user.username);
+  async create(user: CreateUserDto) {
+    const existingUser = await this.findOne(user.username);
     if (existingUser) {
-      //   throw new Error('username already exists');
-      return Promise.reject('username already exists');
+      throw new HttpException(
+        "Ce nom d'utilisateur est déjà utilisé. Essayez un autre nom.",
+        HttpStatus.CONFLICT
+      );
     }
     const entity = this.userRepository.create({
       username: user.username,
@@ -29,6 +31,11 @@ export class UserService {
       //   displayName: user.displayName,
       //   photoUrl: user.photoUrl,
     });
-    return this.userRepository.save(entity);
+    return this.userRepository.save(entity).catch(() => {
+      throw new HttpException(
+        "Erreur technique lors de la création de l'utilisateur",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    });
   }
 }

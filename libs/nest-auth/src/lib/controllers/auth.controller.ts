@@ -1,16 +1,18 @@
 import {
   AuthConfig,
+  CreateUserDto,
+  GoogleConfig,
   LoginConfig,
-  RegisterData,
   User,
 } from '@authentication/common-auth';
 import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Post,
   Req,
-  Request,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -19,6 +21,7 @@ import { Response } from 'express';
 import { GoogleAuthGuard } from '../passport/google/guard';
 import { JwtAuthGuard } from '../passport/jwt/guard';
 import { LocalAuthGuard } from '../passport/local/guard';
+import { RequestWithUser } from '../request/request-user';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../user/user.service';
 
@@ -31,37 +34,34 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
-  async login(@Req() req: any) {
+  async login(@Req() req: RequestWithUser) {
     return this.authService.login(req.user);
   }
 
   @Post('register')
-  async register(@Body() data: RegisterData) {
-    return this.userService.create(data as any);
+  async register(@Body() user: CreateUserDto) {
+    return this.userService.create(user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req: any): Promise<User> {
+  getProfile(@Req() req: RequestWithUser): User {
     return req.user;
   }
 
   @Get('google')
   @UseGuards(GoogleAuthGuard)
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   googleLogin() {}
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  googleLoginCallback(@Req() req: any, @Res() res: Response) {
-    const user = req.user;
-    console.log('googleLoginCallback', user);
-    if (user) {
-      const loginSuccessUrl = this.configService.get<LoginConfig>('login')
-        ?.loginSuccessUrl;
-      res.redirect(`${loginSuccessUrl}/#/?jwt=${req.user.jwt}`);
-    } else {
-      // res.redirect(`${loginSuccessUrl}/#/?jwt=${req.user.jwt}`);
-    }
+  googleLoginCallback(@Req() req: RequestWithUser, @Res() res: Response) {
+    const config = this.configService.get<GoogleConfig>('google');
+    const url = req.user ? config?.successLoginUrl : config?.failureLoginUrl;
+    console.log('googleLoginCallback', url, req.user);
+    res.redirect(`${url}`);
   }
 }

@@ -10,6 +10,7 @@ export default (): AuthConfig => ({
     clientSecret: process.env.CLIENT_SECRET ?? '',
     redirectUrl: process.env.REDIRECT_URL ?? '',
     scopes: (process.env.SCOPES ?? '').split(','),
+    successLoginUrl: process.env.GOOGLE_SUCCESS_LOGIN_URL ?? '',
+    failureLoginUrl: process.env.GOOGLE_FAILURE_LOGIN_URL ?? '',
   },
-  login: { loginSuccessUrl: process.env.LOGIN_SUCCESS_URL ?? '' },
 });

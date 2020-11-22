@@ -15,6 +15,19 @@ export class UserComponent implements OnInit {
   @Select(AuthState.user)
   user$: Observable<User> | undefined;
 
+  actions = [
+    {
+      icon: 'exit_to_app',
+      label: 'Se déconnecter',
+      call: () => this.store.dispatch(new AuthActions.Logout()),
+    },
+    {
+      icon: 'cloud',
+      label: 'Liaison compte Google',
+      call: () => (document.location.href = 'v1/auth/google'),
+    },
+  ];
+
   constructor(
     private readonly store: Store,
     private readonly router: Router,
@@ -33,9 +46,5 @@ export class UserComponent implements OnInit {
 
   login() {
     this.router.navigate(['/login']);
-  }
-
-  logout() {
-    this.store.dispatch(new AuthActions.Logout());
   }
 }

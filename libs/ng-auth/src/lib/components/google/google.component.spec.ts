@@ -5,22 +5,22 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 
-import { LoginComponent } from './login.component';
+import { GoogleComponent } from './google.component';
 
-describe('LoginComponent', () => {
-  let component: LoginComponent;
-  let fixture: ComponentFixture<LoginComponent>;
+describe('GoogleComponent', () => {
+  let component: GoogleComponent;
+  let fixture: ComponentFixture<GoogleComponent>;
 
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [LoginComponent],
+        declarations: [GoogleComponent],
       }).compileComponents();
     })
   );
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LoginComponent);
+    fixture = TestBed.createComponent(GoogleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
