@@ -1,11 +1,13 @@
 import { CreateUserDto } from '@authentication/common-auth';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
+  readonly logger = new Logger('UserService');
+
   constructor(
     @InjectRepository(UserRepository)
     private readonly userRepository: UserRepository
@@ -31,7 +33,8 @@ export class UserService {
       //   displayName: user.displayName,
       //   photoUrl: user.photoUrl,
     });
-    return this.userRepository.save(entity).catch(() => {
+    return this.userRepository.save(entity).catch((error) => {
+      this.logger.error(error);
       throw new HttpException(
         "Erreur technique lors de la création de l'utilisateur",
         HttpStatus.INTERNAL_SERVER_ERROR

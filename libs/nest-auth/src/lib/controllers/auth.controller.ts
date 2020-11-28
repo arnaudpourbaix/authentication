@@ -2,7 +2,6 @@ import {
   AuthConfig,
   CreateUserDto,
   GoogleConfig,
-  LoginConfig,
   User,
 } from '@authentication/common-auth';
 import {

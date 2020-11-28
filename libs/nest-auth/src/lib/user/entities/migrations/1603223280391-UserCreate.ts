@@ -25,7 +25,7 @@ export class UserCreate1603223280391 implements MigrationInterface {
           {
             name: 'display_name',
             type: 'text',
-            isNullable: false,
+            isNullable: true,
           },
           {
             name: 'photo_url',

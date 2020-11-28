@@ -15,8 +15,8 @@ export class UserEntity {
   @Column({ name: 'password', type: 'text', nullable: false })
   password!: string;
 
-  @Column({ name: 'display_name', type: 'text', nullable: false })
-  displayName!: string;
+  @Column({ name: 'display_name', type: 'text', nullable: true })
+  displayName: string | undefined | null;
 
   @Column({ name: 'photo_url', type: 'text', nullable: true })
   photoUrl: string | undefined | null;
