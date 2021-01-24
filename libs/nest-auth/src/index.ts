@@ -1,3 +1,6 @@
+export * from './lib/config/auth.config';
+export * from './lib/config/module.options';
+export * from './lib/config/schema';
 export * from './lib/db-migrations';
 export * from './lib/nest-auth.module';
 export * from './lib/passport/google/guard';

@@ -1,22 +1,24 @@
-import { AuthConfig, GoogleConfig, User } from '@authentication/common-auth';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { User } from '@authentication/common-auth';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
+import authConfig from '../../config/auth.config';
+import { AuthModuleOptions } from '../../config/module.options';
 import { AuthService } from '../../services/auth.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
-    readonly configService: ConfigService<AuthConfig>,
+    @Inject(authConfig.KEY)
+    private readonly config: AuthModuleOptions,
     private readonly authService: AuthService
   ) {
     super({
-      clientID: configService.get<GoogleConfig>('google')?.clientId,
-      clientSecret: configService.get<GoogleConfig>('google')?.clientSecret,
-      callbackURL: configService.get<GoogleConfig>('google')?.redirectUrl,
+      clientID: config.google.clientId,
+      clientSecret: config.google.clientSecret,
+      callbackURL: config.google.redirectUrl,
       passReqToCallback: false,
-      scope: configService.get<GoogleConfig>('google')?.scopes,
+      scope: config.google.scopes,
     });
   }
 

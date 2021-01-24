@@ -1,22 +1,22 @@
+import { JwtData, JwtPayload, User } from '@authentication/common-auth';
 import {
-  AuthConfig,
-  JwtConfig,
-  JwtData,
-  JwtPayload,
-  User,
-} from '@authentication/common-auth';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { classToPlain } from 'class-transformer';
 import { sign } from 'jsonwebtoken';
+import authConfig from '../config/auth.config';
+import { AuthModuleOptions } from '../config/module.options';
 import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly configService: ConfigService<AuthConfig>,
+    @Inject(authConfig.KEY)
+    private readonly config: AuthModuleOptions,
     private readonly userService: UserService,
     private readonly jwtService: JwtService
   ) {}
@@ -38,11 +38,9 @@ export class AuthService {
   async validateOAuthLogin(jwtData: JwtData): Promise<string> {
     try {
       //   await this.userService.create(user);
-      const jwt: string = sign(
-        jwtData,
-        this.configService.get<JwtConfig>('jwt')?.secretKey as string,
-        { expiresIn: this.configService.get<JwtConfig>('jwt')?.expires }
-      );
+      const jwt: string = sign(jwtData, this.config.jwt.secretKey, {
+        expiresIn: this.config.jwt.expires,
+      });
       return jwt;
     } catch (err) {
       throw new InternalServerErrorException('validateOAuthLogin', err.message);

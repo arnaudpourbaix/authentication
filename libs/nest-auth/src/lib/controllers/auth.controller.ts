@@ -1,22 +1,19 @@
-import {
-  AuthConfig,
-  CreateUserDto,
-  GoogleConfig,
-  User,
-} from '@authentication/common-auth';
+import { CreateUserDto, User } from '@authentication/common-auth';
 import {
   Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Post,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
+import authConfig from '../config/auth.config';
+import { AuthModuleOptions } from '../config/module.options';
 import { GoogleAuthGuard } from '../passport/google/guard';
 import { JwtAuthGuard } from '../passport/jwt/guard';
 import { LocalAuthGuard } from '../passport/local/guard';
@@ -27,7 +24,8 @@ import { UserService } from '../user/user.service';
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly configService: ConfigService<AuthConfig>,
+    @Inject(authConfig.KEY)
+    private readonly config: AuthModuleOptions,
     private readonly authService: AuthService,
     private readonly userService: UserService
   ) {}
@@ -58,8 +56,9 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   googleLoginCallback(@Req() req: RequestWithUser, @Res() res: Response) {
-    const config = this.configService.get<GoogleConfig>('google');
-    const url = req.user ? config?.successLoginUrl : config?.failureLoginUrl;
+    const url = req.user
+      ? this.config.google.successLoginUrl
+      : this.config.google.failureLoginUrl;
     console.log('googleLoginCallback', url, req.user);
     res.redirect(`${url}`);
   }
