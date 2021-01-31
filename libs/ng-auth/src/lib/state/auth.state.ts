@@ -46,22 +46,24 @@ export class AuthState {
 
   @Action(AuthActions.Register)
   register(ctx: StateContext<AuthStateModel>, action: AuthActions.Register) {
-    return this.http
-      .post<any>('v1/auth/register', {
-        username: action.username,
-        password: action.password,
+    return this.http.post<any>('v1/auth/register', action.user).pipe(
+      map((result) => {
+        console.log(result);
+        document.location.href = 'v1/auth/google';
+        //   ctx.patchState({
+        //     user,
+        //     token: user.accessToken,
+        //     responseStatus: undefined,
+        //   });
+        //   return user;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        ctx.patchState({
+          responseStatus: error.status,
+        });
+        return throwError(error);
       })
-      .pipe(
-        map((result) => {
-          console.log(result);
-        }),
-        catchError((error: HttpErrorResponse) => {
-          ctx.patchState({
-            responseStatus: error.status,
-          });
-          return throwError(error);
-        })
-      );
+    );
   }
 
   @Action(AuthActions.Login)

@@ -8,12 +8,18 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'username', type: 'text', nullable: false, unique: true })
-  username!: string;
+  @Column({ name: 'email', type: 'text', nullable: false, unique: true })
+  email!: string;
 
   @Exclude()
-  @Column({ name: 'password', type: 'text', nullable: false })
-  password!: string;
+  @Column({ name: 'password', type: 'text', nullable: true })
+  password: string | undefined | null;
+
+  @Column({ name: 'first_name', type: 'text', nullable: true })
+  firstName: string | undefined | null;
+
+  @Column({ name: 'last_name', type: 'text', nullable: true })
+  lastName: string | undefined | null;
 
   @Column({ name: 'display_name', type: 'text', nullable: true })
   displayName: string | undefined | null;
@@ -22,14 +28,20 @@ export class UserEntity {
   photoUrl: string | undefined | null;
 
   @Exclude()
-  @Column({ name: 'google_id', type: 'text', nullable: true })
-  googleId: string | undefined | null;
+  @Column({ name: 'provider', type: 'text', nullable: true })
+  provider: string | undefined | null;
 
-  @Column({ name: 'google_token', type: 'text', nullable: true })
-  googleToken: string | undefined | null;
+  @Exclude()
+  @Column({ name: 'provider_id', type: 'text', nullable: true })
+  providerId: string | undefined | null;
+
+  @Column({ name: 'google_access_token', type: 'text', nullable: true })
+  googleAccessToken: string | undefined | null;
 
   @BeforeInsert()
   async hashPassword() {
-    this.password = await bcrypt.hash(this.password, 13);
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, 13);
+    }
   }
 }

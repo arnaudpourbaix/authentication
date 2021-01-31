@@ -1,3 +1,6 @@
+export * from './lib/auth/google-oauth.data';
+export * from './lib/auth/provider';
+
 export * from './lib/jwt/jwt-data';
 export * from './lib/jwt/payload';
 

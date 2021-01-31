@@ -5,7 +5,7 @@ export class UserRecord1604585956439 implements MigrationInterface {
   public async up(): Promise<void> {
     const repository = getRepository(UserEntity);
     const user = repository.create({
-      username: 'a',
+      email: 'arnaud@gmail.com',
       password: '123',
       displayName: 'Arnaud',
     });
@@ -14,7 +14,7 @@ export class UserRecord1604585956439 implements MigrationInterface {
 
   public async down(): Promise<void> {
     const repository = getRepository(UserEntity);
-    const user = await repository.findOne('a');
+    const user = await repository.findOne({ email: 'arnaud@gmail.com' });
     if (user) {
       await repository.remove(user);
     }

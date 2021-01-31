@@ -1,33 +1,39 @@
 import { CreateUserDto } from '@authentication/common-auth';
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
-import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
   readonly logger = new Logger('UserService');
 
   constructor(
-    @InjectRepository(UserRepository)
-    private readonly userRepository: UserRepository
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>
   ) {}
 
-  async findOne(username: string): Promise<UserEntity | undefined> {
-    return await this.userRepository.findOne({ where: { username } });
+  async getUserByProviderId(providerId: string) {
+    return await this.userRepository.findOne({ providerId });
   }
 
-  //async create(user: User) {
+  async findOne(email: string): Promise<UserEntity | undefined> {
+    return await this.userRepository.findOne({ where: { email } });
+  }
+
   async create(user: CreateUserDto) {
-    const existingUser = await this.findOne(user.username);
+    const existingUser = await this.findOne(user.email);
     if (existingUser) {
-      throw new HttpException(
-        "Ce nom d'utilisateur est déjà utilisé. Essayez un autre nom.",
-        HttpStatus.CONFLICT
-      );
+      throw new ConflictException('Cette adresse email est déjà utilisée.');
     }
     const entity = this.userRepository.create({
-      username: user.username,
+      email: user.email,
       password: user.password,
       //   googleId: user.id,
       //   displayName: user.displayName,
@@ -35,6 +41,17 @@ export class UserService {
     });
     return this.userRepository.save(entity).catch((error) => {
       this.logger.error(error);
+      throw new HttpException(
+        "Erreur technique lors de la création de l'utilisateur",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    });
+  }
+
+  async createFromProvider(user: Partial<UserEntity>) {
+    const entity = this.userRepository.create(user);
+    return this.userRepository.save(entity).catch((error) => {
+      console.error(error);
       throw new HttpException(
         "Erreur technique lors de la création de l'utilisateur",
         HttpStatus.INTERNAL_SERVER_ERROR

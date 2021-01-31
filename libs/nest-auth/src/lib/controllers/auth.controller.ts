@@ -12,7 +12,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
-import authConfig from '../config/auth.config';
 import { AuthModuleOptions } from '../config/module.options';
 import { GoogleAuthGuard } from '../passport/google/guard';
 import { JwtAuthGuard } from '../passport/jwt/guard';
@@ -24,7 +23,7 @@ import { UserService } from '../user/user.service';
 @Controller('auth')
 export class AuthController {
   constructor(
-    @Inject(authConfig.KEY)
+    @Inject(AuthModuleOptions)
     private readonly config: AuthModuleOptions,
     private readonly authService: AuthService,
     private readonly userService: UserService
@@ -34,12 +33,16 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   async login(@Req() req: RequestWithUser) {
+    console.log('login', req.user);
     return this.authService.login(req.user);
   }
 
   @Post('register')
   async register(@Body() user: CreateUserDto) {
     return this.userService.create(user);
+    //.then((result) => {
+    //   return this.authService.login(result as any);
+    //});
   }
 
   @UseGuards(JwtAuthGuard)

@@ -12,7 +12,7 @@ export class UserCreate1603223280391 implements MigrationInterface {
             isPrimary: true,
           },
           {
-            name: 'username',
+            name: 'email',
             type: 'text',
             isNullable: false,
             isUnique: true,
@@ -20,7 +20,17 @@ export class UserCreate1603223280391 implements MigrationInterface {
           {
             name: 'password',
             type: 'text',
-            isNullable: false,
+            isNullable: true,
+          },
+          {
+            name: 'first_name',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'last_name',
+            type: 'text',
+            isNullable: true,
           },
           {
             name: 'display_name',
@@ -33,12 +43,17 @@ export class UserCreate1603223280391 implements MigrationInterface {
             isNullable: true,
           },
           {
-            name: 'google_id',
+            name: 'provider',
             type: 'text',
             isNullable: true,
           },
           {
-            name: 'google_token',
+            name: 'provider_id',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'google_access_token',
             type: 'text',
             isNullable: true,
           },

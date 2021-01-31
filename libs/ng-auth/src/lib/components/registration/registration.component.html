@@ -25,6 +25,14 @@
           <span>Saisissez un utilisateur</span></mat-error
         >
       </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" />
+        <mat-error *ngIf="form.controls.email.errors?.required" class="error">
+          <mat-icon>error</mat-icon>
+          <span>Saisissez une adresse mail</span></mat-error
+        >
+      </mat-form-field>
       <div class="passwords">
         <mat-form-field appearance="fill">
           <mat-label>Mot de passe</mat-label>

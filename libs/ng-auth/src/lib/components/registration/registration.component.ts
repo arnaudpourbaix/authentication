@@ -41,6 +41,7 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
   form = this.formBuilder.group(
     {
       username: ['', Validators.required],
+      email: ['', Validators.required],
       password: [
         '',
         [Validators.required, Validators.minLength(this.passwordMinlength)],
@@ -53,6 +54,7 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   ) as FormGroupTyped<{
     username: string;
+    email: string;
     password: string;
     confirmPassword: string;
   }>;
@@ -98,10 +100,11 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
     this.store.dispatch(
-      new AuthActions.Register(
-        this.form.controls.username.value,
-        this.form.controls.password.value
-      )
+      new AuthActions.Register({
+        username: this.form.controls.username.value,
+        email: this.form.controls.email.value,
+        password: this.form.controls.password.value,
+      })
     );
   }
 }

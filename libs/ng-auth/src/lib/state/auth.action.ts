@@ -6,7 +6,9 @@ export namespace AuthActions {
   export class Register {
     static readonly type = '[Auth] Register';
 
-    constructor(public username: string, public password: string) {}
+    constructor(
+      public user: { username: string; password: string; email: string }
+    ) {}
   }
 
   export class Login {

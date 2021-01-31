@@ -45,7 +45,6 @@ export class NestAuthModule {
       Type<any> | DynamicModule | Promise<DynamicModule> | ForwardReference
     >
   ) {
-    console.log('createModule', providers[0]);
     return {
       module: NestAuthModule,
       controllers: [AuthController],
@@ -64,21 +63,10 @@ export class NestAuthModule {
         UserModule,
         PassportModule.register({
           defaultStrategy: 'jwt',
-          property: 'user',
+          property: 'uuser',
           session: false,
         }),
-        JwtModule.registerAsync({
-          inject: [AuthModuleOptions],
-          useFactory: async (options: AuthModuleOptions) => {
-            console.log('JwtModule.registerAsync', options);
-            return {
-              secret: options.jwt.secretKey,
-              signOptions: {
-                expiresIn: options.jwt.expires,
-              },
-            };
-          },
-        }),
+        JwtModule.register({}),
       ],
       exports: [AuthModuleOptions, PassportModule],
     };
