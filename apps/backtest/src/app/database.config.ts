@@ -8,5 +8,5 @@ export const databaseConnection: SqliteConnectionOptions = {
   logging: false,
   synchronize: false,
   migrationsRun: true,
-  migrations: [...authDatabaseMigrations, UserRecord1604585956439],
+  migrations: [...authDatabaseMigrations /*UserRecord1604585956439*/],
 };

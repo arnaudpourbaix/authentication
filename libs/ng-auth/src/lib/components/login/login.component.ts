@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  Inject,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -17,6 +18,7 @@ import {
 } from '@ngxs/store';
 import { merge, Observable, Subject } from 'rxjs';
 import { map, startWith, takeUntil } from 'rxjs/operators';
+import { AuthModuleConfig, AUTH_CONFIG } from '../../config/module.config';
 import { AuthActions } from '../../state/auth.action';
 import { AuthState } from '../../state/auth.state';
 import { FormGroupTyped } from '../../utils/typed-form';
@@ -48,12 +50,15 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
 
   loading$: Observable<boolean> | undefined;
 
+  loginUrl = `${this.config.serverUrl}/v1/auth/google`;
+
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly store: Store,
-    private readonly actions$: Actions
+    private readonly actions$: Actions,
+    @Inject(AUTH_CONFIG) private readonly config: AuthModuleConfig
   ) {}
 
   ngOnInit() {

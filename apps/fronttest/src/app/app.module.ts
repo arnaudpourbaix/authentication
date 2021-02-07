@@ -24,7 +24,9 @@ const uiModules = [MatButtonModule];
       selectorOptions: { suppressErrors: false },
     }),
     NgxsReduxDevtoolsPluginModule.forRoot(),
-    AuthModule,
+    AuthModule.forRoot({
+      serverUrl: environment.serverUrl,
+    }),
     uiModules,
   ],
   providers: [...authProviders],

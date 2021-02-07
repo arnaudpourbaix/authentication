@@ -1,15 +1,10 @@
 import {
   AuthProvider,
   GoogleOAuthData,
-  JwtData,
   JwtPayload,
   User,
 } from '@authentication/common-auth';
-import {
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { classToPlain } from 'class-transformer';
@@ -48,32 +43,32 @@ export class AuthService {
     provider: AuthProvider,
     data: GoogleOAuthData
   ): Promise<string> {
-    try {
-      let user = await this.userService.getUserByProviderId(providerId);
-      if (!user) {
-        const email =
-          data.emails.find((e) => e.verified)?.value ||
-          (data.emails[0]?.value as string);
-        user = await this.userService.createFromProvider({
-          provider,
-          providerId,
-          firstName: data.name?.givenName,
-          lastName: data.name?.familyName,
-          displayName: data.displayName,
-          email,
-          googleAccessToken: data.accessToken,
-        });
-      }
-      const payload = {
-        thirdPartyId: providerId,
+    let user = await this.userService.getUserByProviderId(providerId);
+    // if (user) {
+    //   throw new ConflictException('Utilisateur déjà enregistré');
+    // }
+    if (!user) {
+      const email =
+        data.emails.find((e) => e.verified)?.value ||
+        (data.emails[0]?.value as string);
+      user = await this.userService.createFromProvider({
         provider,
-      };
-      const jwt: string = sign(payload, this.config.jwt.secretKey, {
-        expiresIn: this.config.jwt.expires,
+        providerId,
+        firstName: data.name?.givenName,
+        lastName: data.name?.familyName,
+        displayName: data.displayName,
+        photoUrl: data.photos?.[0]?.value,
+        email,
+        googleAccessToken: data.accessToken,
       });
-      return jwt;
-    } catch (err) {
-      throw new InternalServerErrorException('validateOAuthLogin', err.message);
     }
+    const payload = {
+      thirdPartyId: providerId,
+      provider,
+    };
+    const jwt: string = sign(payload, this.config.jwt.secretKey, {
+      expiresIn: this.config.jwt.expires,
+    });
+    return jwt;
   }
 }

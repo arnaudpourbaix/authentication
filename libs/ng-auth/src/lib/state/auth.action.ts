@@ -3,6 +3,18 @@ export namespace AuthActions {
     static readonly type = '[Auth] ResetStatus';
   }
 
+  export class InitRegistration {
+    static readonly type = '[Auth] InitRegistration';
+
+    constructor() {}
+  }
+
+  export class GetUser {
+    static readonly type = '[Auth] GetUser';
+
+    constructor() {}
+  }
+
   export class Register {
     static readonly type = '[Auth] Register';
 

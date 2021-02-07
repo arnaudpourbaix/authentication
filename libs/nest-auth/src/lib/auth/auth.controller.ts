@@ -17,8 +17,8 @@ import { GoogleAuthGuard } from '../passport/google/guard';
 import { JwtAuthGuard } from '../passport/jwt/guard';
 import { LocalAuthGuard } from '../passport/local/guard';
 import { RequestWithUser } from '../request/request-user';
-import { AuthService } from '../services/auth.service';
 import { UserService } from '../user/user.service';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {

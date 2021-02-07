@@ -7,20 +7,20 @@ import {
 } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
 import {
   AuthModuleAsyncOptions,
   AuthModuleOptions,
   AuthOptionsFactory,
   IAuthModuleOptions,
 } from './config/module.options';
-import { AuthController } from './controllers/auth.controller';
 import { GoogleAuthGuard } from './passport/google/guard';
 import { GoogleStrategy } from './passport/google/strategy';
 import { JwtAuthGuard } from './passport/jwt/guard';
 import { JwtStrategy } from './passport/jwt/strategy';
 import { LocalAuthGuard } from './passport/local/guard';
 import { LocalStrategy } from './passport/local/strategy';
-import { AuthService } from './services/auth.service';
 import { UserModule } from './user/user.module';
 
 @Module({})

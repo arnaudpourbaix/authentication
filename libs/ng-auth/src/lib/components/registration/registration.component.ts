@@ -7,7 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   Actions,
   ofActionCompleted,
@@ -63,13 +63,13 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private readonly formBuilder: FormBuilder,
-    private readonly router: Router,
+    private readonly route: ActivatedRoute,
     private readonly store: Store,
     private readonly actions$: Actions
   ) {}
 
   ngOnInit() {
-    this.store.dispatch(new AuthActions.ResetStatus());
+    this.store.dispatch(new AuthActions.InitRegistration());
     this.loading$ = merge(
       this.actions$.pipe(
         ofActionDispatched(AuthActions.Register),
