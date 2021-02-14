@@ -23,12 +23,16 @@ export class UserService {
     return await this.userRepository.findOne({ providerId });
   }
 
-  async findOne(email: string): Promise<UserEntity | undefined> {
+  async findById(id: string): Promise<UserEntity | undefined> {
+    return await this.userRepository.findOne({ where: { id } });
+  }
+
+  async findByEmail(email: string): Promise<UserEntity | undefined> {
     return await this.userRepository.findOne({ where: { email } });
   }
 
   async create(user: CreateUserDto) {
-    const existingUser = await this.findOne(user.email);
+    const existingUser = await this.findByEmail(user.email);
     if (existingUser) {
       throw new ConflictException('Cette adresse email est déjà utilisée.');
     }

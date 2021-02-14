@@ -1,7 +1,7 @@
 import { AuthProvider, GoogleProfile } from '@authentication/common-auth';
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-google-oauth20';
+import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { AuthService } from '../../auth/auth.service';
 import { AuthModuleOptions } from '../../config/module.options';
 
@@ -24,17 +24,18 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile: GoogleProfile
+    profile: GoogleProfile,
+    done: VerifyCallback
   ) {
     try {
-      const jwt: string = await this.authService.validateOAuthLogin(
+      const jwt = await this.authService.validateOAuthLogin(
         profile.id,
         AuthProvider.GOOGLE,
         { ...profile, accessToken, refreshToken }
       );
-      return { jwt };
+      done(undefined, jwt);
     } catch (err) {
-      throw new UnauthorizedException(err);
+      done(err);
     }
   }
 }

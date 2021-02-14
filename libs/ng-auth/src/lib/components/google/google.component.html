@@ -3,10 +3,7 @@
     <mat-card-title>Compte Google</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <div *ngIf="isLogged">
-      La liaison avec le compte Google a été effectuée avec succès
-    </div>
-    <div *ngIf="!isLogged">La liaison avec le compte Google a échoué</div>
+    {{ message }}
   </mat-card-content>
   <mat-card-actions>
     <button [routerLink]="['/']" mat-raised-button type="button">

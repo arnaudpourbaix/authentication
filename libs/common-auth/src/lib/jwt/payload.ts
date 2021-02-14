@@ -1,6 +1,6 @@
-export interface JwtPayload {
-  username: string;
-  sub: string;
+import { TokenData } from './token-data';
+
+export interface JwtPayload extends TokenData {
   iat?: number;
   exp?: number;
 }

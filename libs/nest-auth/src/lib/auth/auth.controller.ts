@@ -9,10 +9,12 @@ import {
   Post,
   Req,
   Res,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthModuleOptions } from '../config/module.options';
+import { GoogleExceptionFilter } from '../passport/google/google-exception.filter';
 import { GoogleAuthGuard } from '../passport/google/guard';
 import { JwtAuthGuard } from '../passport/jwt/guard';
 import { LocalAuthGuard } from '../passport/local/guard';
@@ -34,7 +36,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   async login(@Req() req: RequestWithUser) {
     console.log('login', req.user);
-    return this.authService.login(req.user);
+    // return this.authService.login(req.user);
   }
 
   @Post('register')
@@ -58,11 +60,8 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
+  @UseFilters(GoogleExceptionFilter)
   googleLoginCallback(@Req() req: RequestWithUser, @Res() res: Response) {
-    const url = req.user
-      ? this.config.google.successLoginUrl
-      : this.config.google.failureLoginUrl;
-    console.log('googleLoginCallback', url, req.user);
-    res.redirect(`${url}`);
+    res.redirect(`${this.config.google.successLoginUrl}?token=${req.user}`);
   }
 }

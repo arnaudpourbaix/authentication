@@ -62,7 +62,12 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    this.store.dispatch(new AuthActions.ResetStatus());
+    const status = this.route.snapshot.queryParams['status'];
+    if (status) {
+      this.store.dispatch(new AuthActions.SetStatus(+status));
+    } else {
+      this.store.dispatch(new AuthActions.ResetStatus());
+    }
     this.loading$ = merge(
       this.actions$.pipe(
         ofActionDispatched(AuthActions.Login),

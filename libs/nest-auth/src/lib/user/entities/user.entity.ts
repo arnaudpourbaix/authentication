@@ -35,8 +35,9 @@ export class UserEntity {
   @Column({ name: 'provider_id', type: 'text', nullable: true })
   providerId: string | undefined | null;
 
-  @Column({ name: 'google_access_token', type: 'text', nullable: true })
-  googleAccessToken: string | undefined | null;
+  @Exclude()
+  @Column({ name: 'provider_access_token', type: 'text', nullable: true })
+  providerAccessToken: string | undefined | null;
 
   @BeforeInsert()
   async hashPassword() {

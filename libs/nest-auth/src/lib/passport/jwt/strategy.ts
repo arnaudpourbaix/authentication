@@ -1,7 +1,8 @@
-import { JwtPayload, User } from '@authentication/common-auth';
+import { JwtPayload } from '@authentication/common-auth';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { classToPlain } from 'class-transformer';
+import { VerifyCallback } from 'jsonwebtoken';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthModuleOptions } from '../../config/module.options';
 import { UserService } from '../../user/user.service';
@@ -11,7 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private readonly userService: UserService,
     @Inject(AuthModuleOptions)
-    private readonly config: AuthModuleOptions
+    readonly config: AuthModuleOptions
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -20,11 +21,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: JwtPayload): Promise<User> {
-    const user = await this.userService.findOne(payload.username);
+  async validate(payload: JwtPayload, done: VerifyCallback) {
+    const user = await this.userService.findById(payload.sub);
     if (!user) {
       throw new UnauthorizedException('invalid token claims');
     }
-    return classToPlain(user) as User;
+    done(null, classToPlain(user));
   }
 }

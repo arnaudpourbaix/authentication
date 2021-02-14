@@ -10,11 +10,7 @@ import { AuthStateModel, AUTH_STATE_NAME } from './auth.model';
 
 @State<AuthStateModel>({
   name: AUTH_STATE_NAME,
-  defaults: {
-    token: null,
-    user: null,
-    responseStatus: undefined,
-  },
+  defaults: {},
 })
 @Injectable()
 export class AuthState {
@@ -29,7 +25,7 @@ export class AuthState {
   }
 
   @Selector()
-  static token(state: AuthStateModel): string | null {
+  static token(state: AuthStateModel): string | undefined {
     return state.token;
   }
 
@@ -44,15 +40,23 @@ export class AuthState {
   }
 
   @Action(AuthActions.ResetStatus)
-  resetStatus(ctx: StateContext<AuthStateModel>, action: AuthActions.Logout) {
+  resetStatus(ctx: StateContext<AuthStateModel>) {
     ctx.patchState({ responseStatus: undefined });
+  }
+
+  @Action(AuthActions.SetStatus)
+  setStatus(ctx: StateContext<AuthStateModel>, action: AuthActions.SetStatus) {
+    ctx.patchState({ responseStatus: action.status });
   }
 
   @Action(AuthActions.InitRegistration)
   initRegistration(
     ctx: StateContext<AuthStateModel>,
-    action: AuthActions.Logout
+    action: AuthActions.InitRegistration
   ) {
+    ctx.patchState({
+      token: action.token,
+    });
     return ctx
       .dispatch(new AuthActions.ResetStatus())
       .pipe(switchMap(() => ctx.dispatch(new AuthActions.GetUser())));
@@ -106,7 +110,7 @@ export class AuthState {
         map((user) => {
           ctx.patchState({
             user,
-            token: user.accessToken,
+            // token: user.accessToken,
             responseStatus: undefined,
           });
           return user;
@@ -122,6 +126,6 @@ export class AuthState {
 
   @Action(AuthActions.Logout)
   logout(ctx: StateContext<AuthStateModel>, action: AuthActions.Logout) {
-    ctx.patchState({ token: null, user: null });
+    ctx.patchState({ token: undefined, user: undefined });
   }
 }

@@ -53,7 +53,7 @@ export class UserCreate1603223280391 implements MigrationInterface {
             isNullable: true,
           },
           {
-            name: 'google_access_token',
+            name: 'provider_access_token',
             type: 'text',
             isNullable: true,
           },

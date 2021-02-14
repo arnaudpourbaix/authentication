@@ -10,7 +10,7 @@ import { Subject } from 'rxjs';
 export class GoogleComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  isLogged = this.route.snapshot.queryParams['status'] === 'success';
+  message = this.route.snapshot.queryParams['message'];
 
   constructor(private readonly route: ActivatedRoute) {}
 

@@ -38,7 +38,10 @@
       </mat-form-field>
       <mat-error *ngIf="data.status" class="error">
         <mat-icon>error</mat-icon>
-        <span>Utilisateur ou mot de passe incorrect</span>
+        <span *ngIf="data.status === 401"
+          >Utilisateur ou mot de passe incorrect</span
+        >
+        <span *ngIf="data.status === 409">Utilisateur déjà enregistré</span>
       </mat-error>
     </mat-card-content>
     <mat-card-actions>

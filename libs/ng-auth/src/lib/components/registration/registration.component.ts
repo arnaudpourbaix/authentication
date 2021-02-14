@@ -69,7 +69,8 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    this.store.dispatch(new AuthActions.InitRegistration());
+    const token = this.route.snapshot.queryParams['token'];
+    this.store.dispatch(new AuthActions.InitRegistration(token));
     this.loading$ = merge(
       this.actions$.pipe(
         ofActionDispatched(AuthActions.Register),
