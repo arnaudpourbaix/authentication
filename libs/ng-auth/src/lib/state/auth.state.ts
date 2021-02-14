@@ -59,14 +59,17 @@ export class AuthState {
     });
     return ctx
       .dispatch(new AuthActions.ResetStatus())
-      .pipe(switchMap(() => ctx.dispatch(new AuthActions.GetUser())));
+      .pipe(switchMap(() => ctx.dispatch(new AuthActions.LoadUserProfile())));
   }
 
-  @Action(AuthActions.GetUser)
-  getUser(ctx: StateContext<AuthStateModel>, action: AuthActions.Logout) {
-    return this.http.get<any>(`v1/auth/profile`).pipe(
-      map((result) => {
-        console.log(result);
+  @Action(AuthActions.LoadUserProfile)
+  loadUserProfile(ctx: StateContext<AuthStateModel>) {
+    return this.http.get<User>(`v1/auth/profile`).pipe(
+      map((user) => {
+        ctx.patchState({
+          user,
+        });
+        return user;
       }),
       catchError((error: HttpErrorResponse) => {
         ctx.patchState({
@@ -81,8 +84,7 @@ export class AuthState {
   register(ctx: StateContext<AuthStateModel>, action: AuthActions.Register) {
     return this.http.post<any>(`v1/auth/register`, action.user).pipe(
       map((result) => {
-        console.log(result);
-        document.location.href = `v1/auth/google`;
+        console.log('post register', result);
         //   ctx.patchState({
         //     user,
         //     token: user.accessToken,

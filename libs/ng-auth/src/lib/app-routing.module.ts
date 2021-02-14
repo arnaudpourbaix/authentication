@@ -8,11 +8,6 @@ const routes: Routes = [
       import('./components/login/login.module').then((m) => m.LoginModule),
   },
   {
-    path: 'google',
-    loadChildren: () =>
-      import('./components/google/google.module').then((m) => m.GoogleModule),
-  },
-  {
     path: 'register',
     loadChildren: () =>
       import('./components/registration/registration.module').then(

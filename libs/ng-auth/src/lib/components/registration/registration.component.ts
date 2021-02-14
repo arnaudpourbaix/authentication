@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { User } from '@authentication/common-auth';
 import {
   Actions,
   ofActionCompleted,
@@ -35,13 +36,14 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
   @Select(AuthState.responseStatus)
   responseStatus$: Observable<number | undefined> | undefined;
 
-  @ViewChild('username')
-  usernameInput: ElementRef | undefined;
+  @ViewChild('password')
+  passwordInput: ElementRef | undefined;
 
   form = this.formBuilder.group(
     {
-      username: ['', Validators.required],
       email: ['', Validators.required],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
       password: [
         '',
         [Validators.required, Validators.minLength(this.passwordMinlength)],
@@ -53,8 +55,9 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
       validators: MustMatchValidator('password', 'confirmPassword'),
     }
   ) as FormGroupTyped<{
-    username: string;
     email: string;
+    firstName: string;
+    lastName: string;
     password: string;
     confirmPassword: string;
   }>;
@@ -70,7 +73,14 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit() {
     const token = this.route.snapshot.queryParams['token'];
-    this.store.dispatch(new AuthActions.InitRegistration(token));
+    this.store
+      .dispatch(new AuthActions.InitRegistration(token))
+      .subscribe(() => {
+        const user = this.store.selectSnapshot(AuthState.user) as User;
+        this.form.controls.email.patchValue(user.email);
+        this.form.controls.firstName.patchValue(user.firstName);
+        this.form.controls.lastName.patchValue(user.lastName);
+      });
     this.loading$ = merge(
       this.actions$.pipe(
         ofActionDispatched(AuthActions.Register),
@@ -85,8 +95,8 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     setTimeout(() => {
-      if (this.usernameInput) {
-        this.usernameInput.nativeElement.focus();
+      if (this.passwordInput) {
+        this.passwordInput.nativeElement.focus();
       }
     }, 200);
   }
@@ -102,9 +112,11 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     this.store.dispatch(
       new AuthActions.Register({
-        username: this.form.controls.username.value,
         email: this.form.controls.email.value,
         password: this.form.controls.password.value,
+        // firstName: this.form.controls.firstName.value,
+        firstName: null as any,
+        lastName: this.form.controls.lastName.value,
       })
     );
   }

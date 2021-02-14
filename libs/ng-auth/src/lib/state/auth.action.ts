@@ -14,15 +14,20 @@ export namespace AuthActions {
     constructor(public token: string) {}
   }
 
-  export class GetUser {
-    static readonly type = '[Auth] GetUser';
+  export class LoadUserProfile {
+    static readonly type = '[Auth] LoadUserProfile';
   }
 
   export class Register {
     static readonly type = '[Auth] Register';
 
     constructor(
-      public user: { username: string; password: string; email: string }
+      public user: {
+        email: string;
+        password: string;
+        firstName: string;
+        lastName: string;
+      }
     ) {}
   }
 

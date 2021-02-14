@@ -39,9 +39,8 @@ export class UserService {
     const entity = this.userRepository.create({
       email: user.email,
       password: user.password,
-      //   googleId: user.id,
-      //   displayName: user.displayName,
-      //   photoUrl: user.photoUrl,
+      firstName: user.firstName,
+      lastName: user.lastName,
     });
     return this.userRepository.save(entity).catch((error) => {
       this.logger.error(error);
