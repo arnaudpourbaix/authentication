@@ -1,14 +1,17 @@
-import { CreateUserDto } from '@authentication/common-auth';
+import { UpdatePasswordDto, UpdateUserDto } from '@authentication/common-auth';
 import {
   ConflictException,
   HttpException,
   HttpStatus,
   Injectable,
   Logger,
+  NotFoundException,
+  PreconditionFailedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UserService {
@@ -31,21 +34,39 @@ export class UserService {
     return await this.userRepository.findOne({ where: { email } });
   }
 
-  async create(user: CreateUserDto) {
-    const existingUser = await this.findByEmail(user.email);
-    if (existingUser) {
-      throw new ConflictException('Cette adresse email est déjà utilisée.');
+  async updatePassword(id: string, user: UpdatePasswordDto) {
+    const entity = await this.findById(id);
+    if (!entity) {
+      throw new NotFoundException('Utilisateur introuvable.');
     }
-    const entity = this.userRepository.create({
-      email: user.email,
-      password: user.password,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    });
+    if (
+      !!entity.password &&
+      !(await bcrypt.compare(user.oldPassword, entity.password))
+    ) {
+      throw new PreconditionFailedException('Mot de passe actuel incorrecte.');
+    }
+    entity.password = await bcrypt.hash(user.newPassword, 13);
     return this.userRepository.save(entity).catch((error) => {
       this.logger.error(error);
       throw new HttpException(
-        "Erreur technique lors de la création de l'utilisateur",
+        "Erreur technique lors de la mise à jour de l'utilisateur",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    });
+  }
+
+  async update(id: string, user: UpdateUserDto) {
+    const entity = await this.findById(id);
+    if (!entity) {
+      throw new NotFoundException('Utilisateur introuvable.');
+    }
+    entity.email = user.email;
+    entity.firstName = user.firstName;
+    entity.lastName = user.lastName;
+    return this.userRepository.save(entity).catch((error) => {
+      this.logger.error(error);
+      throw new HttpException(
+        "Erreur technique lors de la mise à jour de l'utilisateur",
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     });
@@ -54,7 +75,7 @@ export class UserService {
   async createFromProvider(user: Partial<UserEntity>) {
     const entity = this.userRepository.create(user);
     return this.userRepository.save(entity).catch((error) => {
-      console.error(error);
+      this.logger.error(error);
       throw new HttpException(
         "Erreur technique lors de la création de l'utilisateur",
         HttpStatus.INTERNAL_SERVER_ERROR

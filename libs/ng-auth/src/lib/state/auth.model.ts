@@ -1,9 +1,3 @@
-import { User } from '@authentication/common-auth';
-
 export const AUTH_STATE_NAME = 'auth';
-
-export interface AuthStateModel {
-  token?: string;
-  user?: User;
-  responseStatus?: number;
-}
+export const LOGIN_STATE_NAME = 'authLogin';
+export const PASSWORD_STATE_NAME = 'authPassword';

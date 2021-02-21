@@ -2,13 +2,13 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  Inject,
   OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { User } from '@authentication/common-auth';
 import {
   Actions,
   ofActionCompleted,
@@ -18,17 +18,17 @@ import {
 } from '@ngxs/store';
 import { merge, Observable, Subject } from 'rxjs';
 import { map, startWith, takeUntil } from 'rxjs/operators';
-import { AuthModuleConfig, AUTH_CONFIG } from '../../config/module.config';
 import { AuthActions } from '../../state/auth.action';
 import { AuthState } from '../../state/auth.state';
 import { FormGroupTyped } from '../../utils/typed-form';
+import { MustMatchValidator } from '../../validators/must-match.validator';
 
 @Component({
-  selector: 'apx-auth-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
+  selector: 'app-profile',
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.scss'],
 })
-export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
 
   @Select(AuthState.errorResponse)
@@ -36,42 +36,50 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
     | Observable<{ status: number; message: string } | undefined>
     | undefined;
 
-  @ViewChild('email')
-  emailInput: ElementRef | undefined;
+  @ViewChild('password')
+  passwordInput: ElementRef | undefined;
 
   form = this.formBuilder.group(
     {
       email: ['', Validators.required],
-      password: ['', Validators.required],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
     },
-    { updateOn: 'submit' }
+    {
+      updateOn: 'submit',
+    }
   ) as FormGroupTyped<{
     email: string;
-    password: string;
+    firstName: string;
+    lastName: string;
   }>;
 
   loading$: Observable<boolean> | undefined;
 
-  loginUrl = `${this.config.serverUrl}/v1/auth/google`;
-
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly route: ActivatedRoute,
-    private readonly router: Router,
     private readonly store: Store,
-    private readonly actions$: Actions,
-    @Inject(AUTH_CONFIG) private readonly config: AuthModuleConfig
+    private readonly actions$: Actions
   ) {}
 
   ngOnInit() {
-    this.store.dispatch(new AuthActions.ResetStatus());
+    const token = this.route.snapshot.queryParams['token'];
+    this.store
+      .dispatch(new AuthActions.InitPasswordChange(token))
+      .subscribe(() => {
+        const user = this.store.selectSnapshot(AuthState.user) as User;
+        this.form.controls.email.patchValue(user.email);
+        this.form.controls.firstName.patchValue(user.firstName);
+        this.form.controls.lastName.patchValue(user.lastName);
+      });
     this.loading$ = merge(
       this.actions$.pipe(
-        ofActionDispatched(AuthActions.Login),
+        ofActionDispatched(AuthActions.UpdateUser),
         map(() => true)
       ),
       this.actions$.pipe(
-        ofActionCompleted(AuthActions.Login),
+        ofActionCompleted(AuthActions.UpdateUser),
         map(() => false)
       )
     ).pipe(takeUntil(this.destroy$), startWith(false));
@@ -79,8 +87,8 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     setTimeout(() => {
-      if (this.emailInput) {
-        this.emailInput.nativeElement.focus();
+      if (this.passwordInput) {
+        this.passwordInput.nativeElement.focus();
       }
     }, 200);
   }
@@ -94,16 +102,12 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.form.invalid) {
       return;
     }
-    this.store
-      .dispatch(
-        new AuthActions.Login(
-          this.form.controls.email.value,
-          this.form.controls.password.value
-        )
-      )
-      .subscribe(() => {
-        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-        this.router.navigate([returnUrl]);
-      });
+    this.store.dispatch(
+      new AuthActions.UpdateUser({
+        email: this.form.controls.email.value,
+        firstName: this.form.controls.firstName.value,
+        lastName: this.form.controls.lastName.value,
+      })
+    );
   }
 }

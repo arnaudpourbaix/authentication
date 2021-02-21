@@ -3,12 +3,7 @@ export namespace AuthActions {
     static readonly type = '[Auth] ResetStatus';
   }
 
-  export class SetStatus {
-    static readonly type = '[Auth] SetStatus';
-
-    constructor(public status: number) {}
-  }
-  export class InitRegistration {
+  export class InitPasswordChange {
     static readonly type = '[Auth] InitRegistration';
 
     constructor(public token: string) {}
@@ -18,22 +13,32 @@ export namespace AuthActions {
     static readonly type = '[Auth] LoadUserProfile';
   }
 
-  export class Register {
-    static readonly type = '[Auth] Register';
+  export class UpdateUser {
+    static readonly type = '[Auth] UpdateUser';
 
     constructor(
       public user: {
         email: string;
-        password: string;
         firstName: string;
         lastName: string;
       }
     ) {}
   }
 
+  export class ChangePassword {
+    static readonly type = '[Auth] ChangePassword';
+
+    constructor(
+      public user: {
+        oldPassword: string;
+        newPassword: string;
+      }
+    ) {}
+  }
+
   export class Login {
     static readonly type = '[Auth] Login';
-    constructor(public username: string, public password: string) {}
+    constructor(public email: string, public password: string) {}
   }
 
   export class Logout {

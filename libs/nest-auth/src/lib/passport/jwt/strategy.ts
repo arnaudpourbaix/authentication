@@ -1,7 +1,6 @@
 import { JwtPayload } from '@authentication/common-auth';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { classToPlain } from 'class-transformer';
 import { VerifyCallback } from 'jsonwebtoken';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthModuleOptions } from '../../config/module.options';
@@ -26,6 +25,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (!user) {
       throw new UnauthorizedException('invalid token claims');
     }
-    done(null, classToPlain(user));
+    done(null, payload);
   }
 }

@@ -1,14 +1,14 @@
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ProfileComponent } from './profile.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { RouterModule } from '@angular/router';
-import { RegistrationComponent } from './registration.component';
 
 const uiModules = [
   CommonModule,
@@ -21,14 +21,13 @@ const uiModules = [
 ];
 
 @NgModule({
-  declarations: [RegistrationComponent],
+  declarations: [ProfileComponent],
   imports: [
     RouterModule.forChild([
-      { path: '', pathMatch: 'full', component: RegistrationComponent },
+      { path: '', pathMatch: 'full', component: ProfileComponent },
     ]),
     ReactiveFormsModule,
     ...uiModules,
   ],
-  exports: [RegistrationComponent],
 })
-export class RegistrationModule {}
+export class ProfileModule {}

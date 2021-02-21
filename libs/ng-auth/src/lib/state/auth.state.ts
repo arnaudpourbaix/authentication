@@ -1,14 +1,22 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { User } from '@authentication/common-auth';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { of, throwError } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { AuthModuleConfig, AUTH_CONFIG } from '../config/module.config';
+import { createErrorResponse, ErrorResponse } from '../utils/error-response';
 import { AuthActions } from './auth.action';
-import { AuthStateModel, AUTH_STATE_NAME } from './auth.model';
+import { AUTH_STATE_NAME } from './auth.model';
 
-@State<AuthStateModel>({
+interface StateModel {
+  token?: string;
+  user?: User;
+  errorResponse?: ErrorResponse;
+}
+
+@State<StateModel>({
   name: AUTH_STATE_NAME,
   defaults: {},
 })
@@ -16,54 +24,110 @@ import { AuthStateModel, AUTH_STATE_NAME } from './auth.model';
 export class AuthState {
   constructor(
     private readonly http: HttpClient,
+    private readonly snackBar: MatSnackBar,
     @Inject(AUTH_CONFIG) private readonly config: AuthModuleConfig
   ) {}
 
   @Selector()
-  static responseStatus(state: AuthStateModel): number | undefined {
-    return state.responseStatus;
+  static errorResponse(
+    state: StateModel
+  ): { status: number; message: string } | undefined {
+    return state.errorResponse;
   }
 
   @Selector()
-  static token(state: AuthStateModel): string | undefined {
+  static token(state: StateModel): string | undefined {
     return state.token;
   }
 
   @Selector()
-  static isAuthenticated(state: AuthStateModel): boolean {
+  static isAuthenticated(state: StateModel): boolean {
     return !!state.token;
   }
 
   @Selector()
-  static user(state: AuthStateModel) {
+  static user(state: StateModel) {
     return state.user;
   }
 
   @Action(AuthActions.ResetStatus)
-  resetStatus(ctx: StateContext<AuthStateModel>) {
-    ctx.patchState({ responseStatus: undefined });
+  resetStatus(ctx: StateContext<StateModel>) {
+    ctx.patchState({ errorResponse: undefined });
   }
 
-  @Action(AuthActions.SetStatus)
-  setStatus(ctx: StateContext<AuthStateModel>, action: AuthActions.SetStatus) {
-    ctx.patchState({ responseStatus: action.status });
+  @Action(AuthActions.Login)
+  login(ctx: StateContext<StateModel>, action: AuthActions.Login) {
+    return this.http
+      .post(
+        `v1/auth/login`,
+        {
+          email: action.email,
+          password: action.password,
+        },
+        { responseType: 'text' }
+      )
+      .pipe(
+        switchMap((token) => {
+          ctx.patchState({
+            token,
+            errorResponse: undefined,
+          });
+          return ctx.dispatch(new AuthActions.LoadUserProfile());
+        }),
+        catchError((error: HttpErrorResponse) => {
+          ctx.patchState({
+            token: undefined,
+            errorResponse: createErrorResponse(error),
+          });
+          return throwError(error);
+        })
+      );
   }
 
-  @Action(AuthActions.InitRegistration)
-  initRegistration(
-    ctx: StateContext<AuthStateModel>,
-    action: AuthActions.InitRegistration
+  @Action(AuthActions.Logout)
+  logout(ctx: StateContext<StateModel>) {
+    ctx.patchState({ token: undefined, user: undefined });
+  }
+
+  @Action(AuthActions.InitPasswordChange)
+  initPasswordChange(
+    ctx: StateContext<StateModel>,
+    action: AuthActions.InitPasswordChange
   ) {
-    ctx.patchState({
-      token: action.token,
-    });
+    if (action.token) {
+      ctx.patchState({
+        token: action.token,
+      });
+    }
     return ctx
       .dispatch(new AuthActions.ResetStatus())
       .pipe(switchMap(() => ctx.dispatch(new AuthActions.LoadUserProfile())));
   }
 
+  @Action(AuthActions.ChangePassword)
+  changePassword(
+    ctx: StateContext<StateModel>,
+    action: AuthActions.ChangePassword
+  ) {
+    return this.http.post<any>(`v1/auth/password`, action.user).pipe(
+      tap(() => {
+        this.snackBar.open('Le mot de passe a été changé', undefined, {
+          duration: 3000,
+          verticalPosition: 'top',
+        });
+      }),
+      catchError((error: HttpErrorResponse) => {
+        console.error(error);
+        ctx.patchState({
+          errorResponse: createErrorResponse(error),
+        });
+        return throwError(error);
+      })
+    );
+  }
+
   @Action(AuthActions.LoadUserProfile)
-  loadUserProfile(ctx: StateContext<AuthStateModel>) {
+  loadUserProfile(ctx: StateContext<StateModel>) {
     return this.http.get<User>(`v1/auth/profile`).pipe(
       map((user) => {
         ctx.patchState({
@@ -73,18 +137,17 @@ export class AuthState {
       }),
       catchError((error: HttpErrorResponse) => {
         ctx.patchState({
-          responseStatus: error.status,
+          errorResponse: createErrorResponse(error),
         });
         return throwError(error);
       })
     );
   }
 
-  @Action(AuthActions.Register)
-  register(ctx: StateContext<AuthStateModel>, action: AuthActions.Register) {
-    return this.http.post<any>(`v1/auth/register`, action.user).pipe(
+  @Action(AuthActions.UpdateUser)
+  updateUser(ctx: StateContext<StateModel>, action: AuthActions.UpdateUser) {
+    return this.http.post<any>(`v1/auth/user`, action.user).pipe(
       map((result) => {
-        console.log('post register', result);
         //   ctx.patchState({
         //     user,
         //     token: user.accessToken,
@@ -93,41 +156,12 @@ export class AuthState {
         //   return user;
       }),
       catchError((error: HttpErrorResponse) => {
+        console.error(error);
         ctx.patchState({
-          responseStatus: error.status,
+          errorResponse: createErrorResponse(error),
         });
         return throwError(error);
       })
     );
-  }
-
-  @Action(AuthActions.Login)
-  login(ctx: StateContext<AuthStateModel>, action: AuthActions.Login) {
-    return this.http
-      .post<User>(`v1/auth/login`, {
-        username: action.username,
-        password: action.password,
-      })
-      .pipe(
-        map((user) => {
-          ctx.patchState({
-            user,
-            // token: user.accessToken,
-            responseStatus: undefined,
-          });
-          return user;
-        }),
-        catchError((error: HttpErrorResponse) => {
-          ctx.patchState({
-            responseStatus: error.status,
-          });
-          return throwError(error);
-        })
-      );
-  }
-
-  @Action(AuthActions.Logout)
-  logout(ctx: StateContext<AuthStateModel>, action: AuthActions.Logout) {
-    ctx.patchState({ token: undefined, user: undefined });
   }
 }

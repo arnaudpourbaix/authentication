@@ -1,4 +1,5 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
 import { NgxsModule } from '@ngxs/store';
 import { AppRoutingModule } from './app-routing.module';
@@ -12,6 +13,7 @@ import { AuthState } from './state/auth.state';
     LoginModule,
     UserModule,
     AppRoutingModule,
+    MatSnackBarModule,
     NgxsModule.forFeature([AuthState]),
     NgxsStoragePluginModule.forRoot({
       key: AuthState,

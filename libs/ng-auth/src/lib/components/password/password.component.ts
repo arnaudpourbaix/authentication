@@ -24,27 +24,33 @@ import { FormGroupTyped } from '../../utils/typed-form';
 import { MustMatchValidator } from '../../validators/must-match.validator';
 
 @Component({
-  selector: 'apx-auth-registration',
-  templateUrl: './registration.component.html',
-  styleUrls: ['./registration.component.scss'],
+  selector: 'apx-auth-password',
+  templateUrl: './password.component.html',
+  styleUrls: ['./password.component.scss'],
 })
-export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
+export class PasswordComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
 
   passwordMinlength = 3;
 
-  @Select(AuthState.responseStatus)
-  responseStatus$: Observable<number | undefined> | undefined;
+  @Select(AuthState.errorResponse)
+  error$:
+    | Observable<{ status: number; message: string } | undefined>
+    | undefined;
 
-  @ViewChild('password')
-  passwordInput: ElementRef | undefined;
+  @ViewChild('oldPassword')
+  oldPasswordInput: ElementRef | undefined;
+
+  @ViewChild('newPassword')
+  newPasswordInput: ElementRef | undefined;
+
+  creation = false;
+  title: string | undefined;
 
   form = this.formBuilder.group(
     {
-      email: ['', Validators.required],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      password: [
+      oldPassword: ['', Validators.required],
+      newPassword: [
         '',
         [Validators.required, Validators.minLength(this.passwordMinlength)],
       ],
@@ -52,13 +58,11 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
     },
     {
       updateOn: 'submit',
-      validators: MustMatchValidator('password', 'confirmPassword'),
+      validators: MustMatchValidator('newPassword', 'confirmPassword'),
     }
   ) as FormGroupTyped<{
-    email: string;
-    firstName: string;
-    lastName: string;
-    password: string;
+    oldPassword: string;
+    newPassword: string;
     confirmPassword: string;
   }>;
 
@@ -67,27 +71,33 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
     private readonly store: Store,
     private readonly actions$: Actions
   ) {}
 
   ngOnInit() {
     const token = this.route.snapshot.queryParams['token'];
+    this.creation = !!token;
+    if (this.creation) {
+      this.form.controls.oldPassword.clearValidators();
+      //   this.form.controls.oldPassword.updateValueAndValidity();
+    }
+    this.title = this.creation
+      ? 'Créer un nouveau mot de passe'
+      : 'Modifier votre mot de passe';
     this.store
-      .dispatch(new AuthActions.InitRegistration(token))
+      .dispatch(new AuthActions.InitPasswordChange(token))
       .subscribe(() => {
         const user = this.store.selectSnapshot(AuthState.user) as User;
-        this.form.controls.email.patchValue(user.email);
-        this.form.controls.firstName.patchValue(user.firstName);
-        this.form.controls.lastName.patchValue(user.lastName);
       });
     this.loading$ = merge(
       this.actions$.pipe(
-        ofActionDispatched(AuthActions.Register),
+        ofActionDispatched(AuthActions.UpdateUser),
         map(() => true)
       ),
       this.actions$.pipe(
-        ofActionCompleted(AuthActions.Register),
+        ofActionCompleted(AuthActions.UpdateUser),
         map(() => false)
       )
     ).pipe(takeUntil(this.destroy$), startWith(false));
@@ -95,8 +105,8 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     setTimeout(() => {
-      if (this.passwordInput) {
-        this.passwordInput.nativeElement.focus();
+      if (this.oldPasswordInput) {
+        this.oldPasswordInput.nativeElement.focus();
       }
     }, 200);
   }
@@ -110,14 +120,15 @@ export class RegistrationComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.form.invalid) {
       return;
     }
-    this.store.dispatch(
-      new AuthActions.Register({
-        email: this.form.controls.email.value,
-        password: this.form.controls.password.value,
-        // firstName: this.form.controls.firstName.value,
-        firstName: null as any,
-        lastName: this.form.controls.lastName.value,
-      })
-    );
+    this.store
+      .dispatch(
+        new AuthActions.ChangePassword({
+          oldPassword: this.form.controls.oldPassword.value,
+          newPassword: this.form.controls.newPassword.value,
+        })
+      )
+      .subscribe(() => {
+        this.router.navigate(['/profile']);
+      });
   }
 }

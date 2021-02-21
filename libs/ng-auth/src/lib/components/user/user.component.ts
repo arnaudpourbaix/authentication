@@ -17,14 +17,14 @@ export class UserComponent implements OnInit {
 
   actions = [
     {
+      icon: 'account_box',
+      label: 'Profil',
+      call: () => this.router.navigate(['profile']),
+    },
+    {
       icon: 'exit_to_app',
       label: 'Se déconnecter',
       call: () => this.store.dispatch(new AuthActions.Logout()),
-    },
-    {
-      icon: 'cloud',
-      label: 'Liaison compte Google',
-      call: () => (document.location.href = 'v1/auth/google'),
     },
   ];
 

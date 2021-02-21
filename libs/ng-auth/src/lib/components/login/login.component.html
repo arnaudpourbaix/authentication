@@ -1,7 +1,7 @@
 <form
   [formGroup]="form"
   (ngSubmit)="onSubmit()"
-  *ngIf="{ loading: loading$ | async, status: responseStatus$ | async } as data"
+  *ngIf="{ loading: loading$ | async, error: error$ | async } as data"
 >
   <mat-card class="login-card">
     <mat-card-header>
@@ -15,14 +15,15 @@
       >
       </mat-spinner>
       <mat-form-field appearance="fill">
-        <mat-label>Utilisateur ou adresse e-mail</mat-label>
-        <input matInput #username formControlName="username" />
-        <mat-error
-          *ngIf="form.controls.username.errors?.required"
-          class="error"
-        >
+        <mat-label>Adresse e-mail</mat-label>
+        <input matInput #email formControlName="email" type="email" />
+        <mat-error *ngIf="form.controls.email.errors?.required" class="error">
           <mat-icon>error</mat-icon>
-          <span>Saisissez un utilisateur</span>
+          <span>Saisissez une adresse e-mail</span>
+        </mat-error>
+        <mat-error *ngIf="form.controls.email.errors" class="error">
+          <mat-icon>error</mat-icon>
+          <span>{{ form.controls.email.errors | json }}</span>
         </mat-error>
       </mat-form-field>
       <mat-form-field appearance="fill">
@@ -36,12 +37,10 @@
           <span>Entrez un mot de passe</span></mat-error
         >
       </mat-form-field>
-      <mat-error *ngIf="data.status" class="error">
+      <mat-error *ngIf="data.error" class="error">
         <mat-icon>error</mat-icon>
-        <span *ngIf="data.status === 401"
-          >Utilisateur ou mot de passe incorrect</span
-        >
-        <span *ngIf="data.status === 409">Utilisateur déjà enregistré</span>
+        <!-- <span *ngIf="data.error === 401">Utilisateur ou mot de passe incorrect</span> -->
+        <span>{{ data.error.message }}</span>
       </mat-error>
     </mat-card-content>
     <mat-card-actions>

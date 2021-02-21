@@ -1,4 +1,8 @@
-import { CreateUserDto, User } from '@authentication/common-auth';
+import {
+  UpdatePasswordDto,
+  UpdateUserDto,
+  User,
+} from '@authentication/common-auth';
 import {
   Body,
   Controller,
@@ -11,7 +15,10 @@ import {
   Res,
   UseFilters,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
+import { classToPlain } from 'class-transformer';
 import { Response } from 'express';
 import { AuthModuleOptions } from '../config/module.options';
 import { GoogleExceptionFilter } from '../passport/google/google-exception.filter';
@@ -35,22 +42,49 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   async login(@Req() req: RequestWithUser) {
-    console.log('login', req.user);
-    // return this.authService.login(req.user);
+    return req.user;
   }
 
-  @Post('register')
-  async register(@Body() user: CreateUserDto) {
-    return this.userService.create(user);
-    //.then((result) => {
-    //   return this.authService.login(result as any);
-    //});
+  @Post('password')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    })
+  )
+  async updatePassword(
+    @Req() req: RequestWithUser,
+    @Body() user: UpdatePasswordDto
+  ) {
+    const updateUser = await this.userService.updatePassword(
+      req.user.sub,
+      user
+    );
+    return classToPlain(updateUser) as User;
+  }
+
+  @Post('user')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    })
+  )
+  async updateUser(@Req() req: RequestWithUser, @Body() user: UpdateUserDto) {
+    const updateUser = await this.userService.update(req.user.sub, user);
+    return classToPlain(updateUser) as User;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Req() req: RequestWithUser): User {
-    return req.user;
+  async getProfile(@Req() req: RequestWithUser) {
+    const user = await this.userService.findById(req.user.sub);
+    return classToPlain(user) as User;
   }
 
   @Get('google')
