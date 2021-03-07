@@ -1,0 +1,29 @@
+<div *ngIf="{ user: user$ | async } as data">
+  <button class="login" *ngIf="!data.user" mat-raised-button (click)="login()">
+    <mat-icon>account_circle</mat-icon>
+    Se connecter
+  </button>
+  <div *ngIf="data.user" class="profile">
+    <button mat-button [matMenuTriggerFor]="menu">
+      <mat-icon>more_vert</mat-icon>
+      <span *ngIf="!data.user.photoUrl">{{
+        data.user.displayName || data.user.username
+      }}</span>
+      <img
+        *ngIf="data.user.photoUrl"
+        [src]="data.user.photoUrl"
+        [title]="data.user.displayName"
+      />
+    </button>
+    <mat-menu #menu="matMenu">
+      <button
+        *ngFor="let action of actions"
+        mat-menu-item
+        (click)="action.call()"
+      >
+        <mat-icon>{{ action.icon }}</mat-icon>
+        <span>{{ action.label }}</span>
+      </button>
+    </mat-menu>
+  </div>
+</div>

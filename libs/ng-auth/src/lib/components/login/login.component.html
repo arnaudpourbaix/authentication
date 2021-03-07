@@ -1,0 +1,54 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  *ngIf="{ loading: loading$ | async, error: error$ | async } as data"
+>
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>Se connecter</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-spinner
+        [style.display]="data.loading ? 'block' : 'none'"
+        class="loading-spinner"
+        diameter="50"
+      >
+      </mat-spinner>
+      <mat-form-field appearance="fill">
+        <mat-label>Adresse e-mail</mat-label>
+        <input matInput #email formControlName="email" type="email" />
+        <mat-error *ngIf="form.controls.email.errors?.required" class="error">
+          <mat-icon>error</mat-icon>
+          <span>Saisissez une adresse e-mail</span>
+        </mat-error>
+        <mat-error *ngIf="form.controls.email.errors" class="error">
+          <mat-icon>error</mat-icon>
+          <span>{{ form.controls.email.errors | json }}</span>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Saisissez votre mot de passe</mat-label>
+        <input matInput formControlName="password" type="password" />
+        <mat-error
+          *ngIf="form.controls.password.errors?.required"
+          class="error"
+        >
+          <mat-icon>error</mat-icon>
+          <span>Entrez un mot de passe</span></mat-error
+        >
+      </mat-form-field>
+      <mat-error *ngIf="data.error" class="error">
+        <mat-icon>error</mat-icon>
+        <span>{{ data.error.message }}</span>
+      </mat-error>
+    </mat-card-content>
+    <mat-card-actions>
+      <a [href]="loginUrl"
+        ><button mat-raised-button type="button">
+          Créer un compte
+        </button></a
+      >
+      <button mat-raised-button type="submit" color="primary">Connexion</button>
+    </mat-card-actions>
+  </mat-card>
+</form>

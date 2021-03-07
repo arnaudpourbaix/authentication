@@ -1,0 +1,41 @@
+:host {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card {
+  width: 20rem;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.loading-spinner {
+  position: absolute;
+  top: 6rem;
+  left: 10rem;
+  z-index: 99999;
+}
+
+.error {
+  display: flex;
+  color: #d93025;
+  font-size: 0.75rem;
+  font-family: roboto, 'Noto Sans Myanmar UI', arial, sans-serif;
+  mat-icon {
+    font-size: 1rem;
+    margin-right: 0.5rem;
+  }
+  span {
+    margin-top: 0.1rem;
+  }
+}
