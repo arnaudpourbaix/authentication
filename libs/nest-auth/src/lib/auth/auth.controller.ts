@@ -27,14 +27,12 @@ import { JwtAuthGuard } from '../passport/jwt/guard';
 import { LocalAuthGuard } from '../passport/local/guard';
 import { RequestWithUser } from '../request/request-user';
 import { UserService } from '../user/user.service';
-import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     @Inject(AuthModuleOptions)
     private readonly config: AuthModuleOptions,
-    private readonly authService: AuthService,
     private readonly userService: UserService
   ) {}
 
@@ -42,7 +40,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   async login(@Req() req: RequestWithUser) {
-    return req.user;
+    console.log(req.user);
+    return { token: req.user };
   }
 
   @Post('password')
@@ -66,7 +65,7 @@ export class AuthController {
     return classToPlain(updateUser) as User;
   }
 
-  @Post('user')
+  @Post('profile')
   @UseGuards(JwtAuthGuard)
   @UsePipes(
     new ValidationPipe({
@@ -75,14 +74,17 @@ export class AuthController {
       transform: true,
     })
   )
-  async updateUser(@Req() req: RequestWithUser, @Body() user: UpdateUserDto) {
-    const updateUser = await this.userService.update(req.user.sub, user);
+  async updateUserProfile(
+    @Req() req: RequestWithUser,
+    @Body() user: UpdateUserDto
+  ) {
+    const updateUser = await this.userService.updateProfile(req.user.sub, user);
     return classToPlain(updateUser) as User;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  async getProfile(@Req() req: RequestWithUser) {
+  async getUserProfile(@Req() req: RequestWithUser) {
     const user = await this.userService.findById(req.user.sub);
     return classToPlain(user) as User;
   }

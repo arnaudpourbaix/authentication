@@ -58,18 +58,14 @@ export class AuthState {
   @Action(AuthActions.Login)
   login(ctx: StateContext<StateModel>, action: AuthActions.Login) {
     return this.http
-      .post(
-        `v1/auth/login`,
-        {
-          email: action.email,
-          password: action.password,
-        },
-        { responseType: 'text' }
-      )
+      .post<{ token: string }>(`v1/auth/login`, {
+        email: action.email,
+        password: action.password,
+      })
       .pipe(
-        switchMap((token) => {
+        switchMap((res) => {
           ctx.patchState({
-            token,
+            token: res.token,
             errorResponse: undefined,
           });
           return ctx.dispatch(new AuthActions.LoadUserProfile());
@@ -117,7 +113,6 @@ export class AuthState {
         });
       }),
       catchError((error: HttpErrorResponse) => {
-        console.error(error);
         ctx.patchState({
           errorResponse: createErrorResponse(error),
         });
@@ -144,19 +139,20 @@ export class AuthState {
     );
   }
 
-  @Action(AuthActions.UpdateUser)
-  updateUser(ctx: StateContext<StateModel>, action: AuthActions.UpdateUser) {
-    return this.http.post<any>(`v1/auth/user`, action.user).pipe(
-      map((result) => {
-        //   ctx.patchState({
-        //     user,
-        //     token: user.accessToken,
-        //     responseStatus: undefined,
-        //   });
-        //   return user;
+  @Action(AuthActions.UpdateUserProfile)
+  updateUserProfile(
+    ctx: StateContext<StateModel>,
+    action: AuthActions.UpdateUserProfile
+  ) {
+    return this.http.post<User>(`v1/auth/profile`, action.user).pipe(
+      map((user) => {
+        ctx.patchState({
+          user,
+          errorResponse: undefined,
+        });
+        return user;
       }),
       catchError((error: HttpErrorResponse) => {
-        console.error(error);
         ctx.patchState({
           errorResponse: createErrorResponse(error),
         });

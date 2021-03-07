@@ -75,11 +75,11 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
       });
     this.loading$ = merge(
       this.actions$.pipe(
-        ofActionDispatched(AuthActions.UpdateUser),
+        ofActionDispatched(AuthActions.UpdateUserProfile),
         map(() => true)
       ),
       this.actions$.pipe(
-        ofActionCompleted(AuthActions.UpdateUser),
+        ofActionCompleted(AuthActions.UpdateUserProfile),
         map(() => false)
       )
     ).pipe(takeUntil(this.destroy$), startWith(false));
@@ -103,7 +103,7 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
     this.store.dispatch(
-      new AuthActions.UpdateUser({
+      new AuthActions.UpdateUserProfile({
         email: this.form.controls.email.value,
         firstName: this.form.controls.firstName.value,
         lastName: this.form.controls.lastName.value,

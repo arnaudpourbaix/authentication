@@ -93,11 +93,11 @@ export class PasswordComponent implements OnInit, OnDestroy, AfterViewInit {
       });
     this.loading$ = merge(
       this.actions$.pipe(
-        ofActionDispatched(AuthActions.UpdateUser),
+        ofActionDispatched(AuthActions.UpdateUserProfile),
         map(() => true)
       ),
       this.actions$.pipe(
-        ofActionCompleted(AuthActions.UpdateUser),
+        ofActionCompleted(AuthActions.UpdateUserProfile),
         map(() => false)
       )
     ).pipe(takeUntil(this.destroy$), startWith(false));

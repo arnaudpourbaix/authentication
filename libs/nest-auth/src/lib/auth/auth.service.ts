@@ -4,7 +4,6 @@ import {
   TokenData,
 } from '@authentication/common-auth';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import { AuthModuleOptions } from '../config/module.options';
@@ -16,19 +15,19 @@ export class AuthService {
   constructor(
     @Inject(AuthModuleOptions)
     private readonly config: AuthModuleOptions,
-    private readonly userService: UserService,
-    private readonly jwtService: JwtService
+    private readonly userService: UserService
   ) {}
 
   async validateLogin(email: string, password: string) {
     const user = await this.userService.findByEmail(email);
+    const error = 'Utilisateur ou mot de passe incorrect';
     if (!user) {
-      throw new UnauthorizedException('invalid user');
+      throw new UnauthorizedException(error);
     }
     if (user && (await bcrypt.compare(password, user.password ?? ''))) {
       return this.jwtSignIn(user.id);
     } else {
-      throw new UnauthorizedException('invalid password');
+      throw new UnauthorizedException(error);
     }
   }
 

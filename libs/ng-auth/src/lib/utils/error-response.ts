@@ -8,10 +8,11 @@ export interface ErrorResponse {
 export function createErrorResponse(error: HttpErrorResponse) {
   let message = '';
   if (typeof error.error === 'string') {
-    // FIXME: fix case when error is stringified json (case of wrong login for example)
     message = error.error;
   } else if (typeof error.error === 'object') {
     message = error.error.message;
+  } else {
+    message = error.message;
   }
   return {
     status: error.status,

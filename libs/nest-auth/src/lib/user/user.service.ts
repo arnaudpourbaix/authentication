@@ -55,10 +55,14 @@ export class UserService {
     });
   }
 
-  async update(id: string, user: UpdateUserDto) {
+  async updateProfile(id: string, user: UpdateUserDto) {
     const entity = await this.findById(id);
     if (!entity) {
       throw new NotFoundException('Utilisateur introuvable.');
+    }
+    const duplicateUser = await this.findByEmail(user.email);
+    if (duplicateUser && duplicateUser.id !== id) {
+      throw new ConflictException('Adresse email déjà utilisée.');
     }
     entity.email = user.email;
     entity.firstName = user.firstName;
